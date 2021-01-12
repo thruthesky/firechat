@@ -1,7 +1,11 @@
 part of 'firechat.dart';
 
+enum MessageType { image, text }
+
 /// [ChatMessage] presents the chat message under
 /// `/chat/messages/{roomId}/{messageId}` collection.
+/// 
+/// [type] is the type of the message. it can be `image` or `text`.
 class ChatMessage {
   Timestamp createdAt;
   List<dynamic> newUsers;
@@ -9,7 +13,7 @@ class ChatMessage {
   String senderPhotoURL;
   String senderUid;
   String text;
-  String type;
+  MessageType type;
   bool isMine(String loginUserId) => senderUid == loginUserId;
   ChatMessage({
     this.createdAt,
@@ -28,7 +32,7 @@ class ChatMessage {
       senderPhotoURL: data['senderPhotoURL'],
       senderUid: data['senderUid'],
       text: data['text'],
-      type: data['type']
+      type: MessageType.values[data['type']],
     );
   }
 }

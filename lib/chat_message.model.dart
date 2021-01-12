@@ -9,6 +9,7 @@ class ChatMessage {
   String senderPhotoURL;
   String senderUid;
   String text;
+  String type;
   bool isMine(String loginUserId) => senderUid == loginUserId;
   ChatMessage({
     this.createdAt,
@@ -17,6 +18,7 @@ class ChatMessage {
     this.senderPhotoURL,
     this.senderUid,
     this.text,
+    this.type,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
     return ChatMessage(
@@ -26,6 +28,7 @@ class ChatMessage {
       senderPhotoURL: data['senderPhotoURL'],
       senderUid: data['senderUid'],
       text: data['text'],
+      type: data['type']
     );
   }
 }

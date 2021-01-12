@@ -289,13 +289,13 @@ class ChatRoom extends ChatBase {
   ///
   /// [photoURL] is the sender's photo url. Default is `ff.user.photoURL`.
   /// 
-  /// [type] value must come from `MessageType` enum. It can be `image` or `text` if string only.
+  /// [type] is the type of the message. It can be `image` or `text` if string only.
   Future<Map<String, dynamic>> sendMessage({
     @required String text,
     Map<String, dynamic> extra,
     @required String displayName,
     String photoURL = '',
-    MessageType type = MessageType.text,
+    String type = '',
   }) async {
     if (displayName == null || displayName.trim() == '') {
       throw CHAT_DISPLAY_NAME_IS_EMPTY;
@@ -305,7 +305,7 @@ class ChatRoom extends ChatBase {
       'senderUid': loginUserId,
       'senderDisplayName': displayName,
       'senderPhotoURL': photoURL,
-      'type': type.index,
+      'type': type,
       'text': text,
 
       // Time that this message(or last message) was created.

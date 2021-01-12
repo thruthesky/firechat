@@ -3,7 +3,7 @@ part of 'firechat.dart';
 /// [ChatMessage] presents the chat message under
 /// `/chat/messages/{roomId}/{messageId}` collection.
 ///
-/// [type] is the type of the message. it can be `image` or `text`.
+/// [isImage] returns bool if the message is image or not.
 class ChatMessage {
   Timestamp createdAt;
   List<dynamic> newUsers;
@@ -13,6 +13,13 @@ class ChatMessage {
   String text;
   String type;
   bool isMine(String loginUserId) => senderUid == loginUserId;
+
+  bool get isImage => text.contains('.')
+      ? ['jpg', 'jpeg', 'png', 'gif'].contains(
+          text.split('.').last.toLowerCase(),
+        )
+      : false;
+
   ChatMessage({
     this.createdAt,
     this.newUsers,
@@ -30,7 +37,6 @@ class ChatMessage {
       senderPhotoURL: data['senderPhotoURL'],
       senderUid: data['senderUid'],
       text: data['text'],
-      type: data['type'],
     );
   }
 }

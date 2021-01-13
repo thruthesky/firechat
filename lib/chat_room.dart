@@ -18,7 +18,7 @@ class ChatRoom extends ChatBase {
     Function globalRoomChange,
   })  : _render = render,
         _globalRoomChange = globalRoomChange {
-    this.loginUserId = loginUserId;
+    ChatConfig.loginUserId = loginUserId;
   }
 
   int _limit = 30;

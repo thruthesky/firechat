@@ -14,6 +14,7 @@ part 'chat_global_room.model.dart';
 part 'chat_user_room.model.dart';
 part 'chat_message.model.dart';
 
+part 'chat_config.dart';
 part 'chat_base.dart';
 part 'chat_user_room_list.dart';
 part 'chat_room.dart';

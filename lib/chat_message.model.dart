@@ -9,7 +9,8 @@ class ChatMessage {
   String senderPhotoURL;
   String senderUid;
   String text;
-  bool isMine(String loginUserId) => senderUid == loginUserId;
+  bool isMine;
+  bool isImage;
   ChatMessage({
     this.createdAt,
     this.newUsers,
@@ -17,8 +18,19 @@ class ChatMessage {
     this.senderPhotoURL,
     this.senderUid,
     this.text,
+    this.isMine,
+    this.isImage,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
+    bool isImage = false;
+    if (data['text'] != null) {
+      String t = data['text'];
+      if (t.startsWith('http://') || t.startsWith('https://')) {
+        if (t.endsWith('.jpg') || t.endsWith('.jpeg') || t.endsWith('.gif') || t.endsWith('.png')) {
+          isImage = true;
+        }
+      }
+    }
     return ChatMessage(
       createdAt: data['createdAt'],
       newUsers: data['newUsers'],
@@ -26,6 +38,8 @@ class ChatMessage {
       senderPhotoURL: data['senderPhotoURL'],
       senderUid: data['senderUid'],
       text: data['text'],
+      isMine: data['senderUid'] == ChatConfig.loginUserId,
+      isImage: isImage,
     );
   }
 }

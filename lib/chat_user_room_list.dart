@@ -27,7 +27,7 @@ class ChatMyRoomList extends ChatBase {
     String order = "createdAt",
   })  : __render = render,
         _order = order {
-    this.loginUserId = loginUserId;
+    ChatConfig.loginUserId = loginUserId;
     listenRoomList();
   }
 

@@ -11,9 +11,13 @@ class ChatMessage {
   String senderPhotoURL;
   String senderUid;
   String text;
-  String type;
   bool isMine(String loginUserId) => senderUid == loginUserId;
 
+  /// Todo: improve to really prove that it's an image file.
+  /// 
+  /// considerations:
+  ///  it begins with "(Https/Http)://"
+  ///  ends with image file extensions.
   bool get isImage => text.contains('.')
       ? ['jpg', 'jpeg', 'png', 'gif'].contains(
           text.split('.').last.toLowerCase(),
@@ -27,7 +31,6 @@ class ChatMessage {
     this.senderPhotoURL,
     this.senderUid,
     this.text,
-    this.type,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
     return ChatMessage(

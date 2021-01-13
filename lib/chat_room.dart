@@ -288,6 +288,8 @@ class ChatRoom extends ChatBase {
   /// `ff.user.displayName`.
   ///
   /// [photoURL] is the sender's photo url. Default is `ff.user.photoURL`.
+  /// 
+  /// [type] is the type of the message. It can be `image` or `text` if string only.
   Future<Map<String, dynamic>> sendMessage({
     @required String text,
     Map<String, dynamic> extra,

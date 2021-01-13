@@ -2,6 +2,8 @@ part of 'firechat.dart';
 
 /// [ChatMessage] presents the chat message under
 /// `/chat/messages/{roomId}/{messageId}` collection.
+///
+/// [isImage] returns bool if the message is image or not.
 class ChatMessage {
   Timestamp createdAt;
   List<dynamic> newUsers;
@@ -11,6 +13,8 @@ class ChatMessage {
   String text;
   bool isMine;
   bool isImage;
+  String type;
+
   ChatMessage({
     this.createdAt,
     this.newUsers,
@@ -20,6 +24,7 @@ class ChatMessage {
     this.text,
     this.isMine,
     this.isImage,
+    this.type,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
     bool isImage = false;

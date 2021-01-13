@@ -107,6 +107,7 @@ class ChatRoom extends ChatBase {
       } else {
         // Create room named based on the user
         // Users array can contain no user or only one user, or even many users.
+        // User id must be sorted to generate same room id with same user.
         users.sort();
         String uids = users.join('');
         _id = md5.convert(utf8.encode(uids)).toString();
@@ -288,7 +289,7 @@ class ChatRoom extends ChatBase {
   /// `ff.user.displayName`.
   ///
   /// [photoURL] is the sender's photo url. Default is `ff.user.photoURL`.
-  /// 
+  ///
   /// [type] is the type of the message. It can be `image` or `text` if string only.
   Future<Map<String, dynamic>> sendMessage({
     @required String text,

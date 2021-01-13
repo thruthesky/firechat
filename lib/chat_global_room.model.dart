@@ -1,9 +1,9 @@
 part of './firechat.dart';
 
-/// [ChatGloalRoom] is a model the chat room under `/chat-global` collection. All the chat room resides under this collection.
-class ChatGlobalRoom {
+/// [ChatGloalRoom] is a model (extending [ChatBase]) that represents the chat room under `/chat-global` collection.
+/// All the chat room resides under this collection.
+class ChatGlobalRoom extends ChatBase {
   String roomId;
-  String loginUserId;
   String title;
   List<String> users;
   List<String> moderators;

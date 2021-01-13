@@ -1,7 +1,7 @@
 part of './firechat.dart';
 
 class ChatBase {
-  String loginUserId;
+  String get loginUserId => ChatConfig.loginUserId;
   FirebaseFirestore get db => FirebaseFirestore.instance;
 
   int page = 0;

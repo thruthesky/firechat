@@ -12,8 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: "0.6.0"
-  cloud_firestore: "^0.15.0"
+  firebase_core: "0.7.0"
+  cloud_firestore: "^0.16.0"
   crypto: ^2.1.5
 
 dev_dependencies:

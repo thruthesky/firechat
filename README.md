@@ -7,6 +7,10 @@ Firebase chat package for Flutter
 - Firechat does not have support for photo uploading that is because every app has different backends.
   - But firechat provides and interface for handling uploaded photos.
 
+# Resources
+
+- Most of the code is coming from [FireFlutter](https://pub.dev/packages/fireflutter). It's worthy to check out FireFlutter README file.
+
 # Installation
 
 # Packages
@@ -75,4 +79,30 @@ Firebase chat package for Flutter
         allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/global/room-list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
       }
     }
+```
+
+# Developer Guideline
+
+## Declaring Instances
+
+- Declare chat class instances in global scope like below.
+
+```dart
+/// [chat] is the chat room instance.
+///
+/// The reason why it is declared in global scope is that; the app needs to know if the login user is
+/// in a chat room. So, when he gets a push notification from the chat room where he is in,
+/// the push messge will be ignored.
+ChatRoom chat;
+
+/// [myRoomList] is the instance of ChatMyRoomList.
+///
+/// The reason why it is declared in global scope is to listen all incoming message of the user's chat rooms
+/// And display it as toast, and display the total number of new chat message as badge on menu icon.
+///
+/// This will be instanciated in main.dart.
+ChatMyRoomList myRoomList;
+
+/// [myRoomListChanges] will be fired whenever/whatever events posted from the login user's chat rooms.
+BehaviorSubject myRoomListChanges = BehaviorSubject.seeded(null);
 ```

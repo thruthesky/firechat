@@ -2,6 +2,11 @@
 
 Firebase chat package for Flutter
 
+# TODOs
+
+- Make chat room and chat list singleton.
+- Use rxdart to notify all the event. No more render!
+
 # Overview
 
 - Firechat does not support for file uploading since every app has different backends.
@@ -83,26 +88,15 @@ Firebase chat package for Flutter
 
 # Developer Guideline
 
-## Declaring Instances
-
-- Declare chat class instances in global scope like below.
+## Global varaibles
 
 ```dart
-/// [chat] is the chat room instance.
-///
-/// The reason why it is declared in global scope is that; the app needs to know if the login user is
-/// in a chat room. So, when he gets a push notification from the chat room where he is in,
-/// the push messge will be ignored.
-ChatRoom chat;
+room() {
+  return ChatRoom.instance;
+}
+roomList() {
+  return ChatRoomList.instance;
+}
 
-/// [myRoomList] is the instance of ChatMyRoomList.
-///
-/// The reason why it is declared in global scope is to listen all incoming message of the user's chat rooms
-/// And display it as toast, and display the total number of new chat message as badge on menu icon.
-///
-/// This will be instanciated in main.dart.
-ChatMyRoomList myRoomList;
-
-/// [myRoomListChanges] will be fired whenever/whatever events posted from the login user's chat rooms.
-BehaviorSubject myRoomListChanges = BehaviorSubject.seeded(null);
+room().listen(() { ... });
 ```

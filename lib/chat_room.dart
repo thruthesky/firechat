@@ -5,6 +5,19 @@ part of 'firechat.dart';
 /// By defining this helper class, you may open more than one chat room at the same time.
 /// todo separate this class to `chat.dart`
 class ChatRoom extends ChatBase {
+  /// Api Singleton
+  static ChatRoom _instance;
+  static ChatRoom get instance {
+    if (_instance == null) {
+      _instance = ChatRoom._internal();
+    }
+    return _instance;
+  }
+
+  ChatRoom._internal() {
+    print('=> ChatRoom._internal(). This must be called only once.');
+  }
+
   /// [render] will be called to notify chat room listener to re-render the screen.
   ///
   /// For one chat message sending,
@@ -241,7 +254,8 @@ class ChatRoom extends ChatBase {
           /// if it's new message, add at bottom.
           else if (messages.length > 0 &&
               messages[0]['createdAt'] != null &&
-              message['createdAt'].microsecondsSinceEpoch > messages[0]['createdAt'].microsecondsSinceEpoch) {
+              message['createdAt'].microsecondsSinceEpoch >
+                  messages[0]['createdAt'].microsecondsSinceEpoch) {
             messages.add(message);
           } else {
             // if it's old message, add on top.
@@ -421,7 +435,8 @@ class ChatRoom extends ChatBase {
     _globalRoom.blockedUsers.add(uid);
 
     /// Update users and blockedUsers first to inform by sending a message.
-    await globalRoomDoc(id).update({'users': _globalRoom.users, 'blockedUsers': _globalRoom.blockedUsers});
+    await globalRoomDoc(id)
+        .update({'users': _globalRoom.users, 'blockedUsers': _globalRoom.blockedUsers});
 
     /// Inform all users.
     await sendMessage(text: ChatProtocol.block, displayName: uid, extra: {'userName': userName});
@@ -481,7 +496,8 @@ class ChatRoom extends ChatBase {
     _globalRoom.users.remove(loginUserId);
 
     // Update last message of room users that the user is leaving.
-    await sendMessage(text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
+    await sendMessage(
+        text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
@@ -507,7 +523,8 @@ class ChatRoom extends ChatBase {
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
-    await sendMessage(text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
+    await sendMessage(
+        text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
   }
 
   /// Returns a room of a user.

@@ -4,8 +4,8 @@ Firebase chat package for Flutter
 
 # Overview
 
-- Firechat does not have support for photo uploading that is because every app has different backends.
-  - But firechat provides and interface for handling uploaded photos.
+- Firechat does not support for file uploading since every app has different backends.
+  - But it provides an interface for uploading photo and it should be very simple.
 
 # Resources
 

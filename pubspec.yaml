@@ -15,6 +15,14 @@ dependencies:
   cloud_firestore: "^0.16.0"
   crypto: ^2.1.5
 
+    # Chat room. Scroll adjustment when keypad is open.
+  flutter_keyboard_visibility: ^4.0.3
+
+  flutter_chat_bubble: ^1.0.2
+
+  cached_network_image: ^2.5.0
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,4 +1,4 @@
-part of './firechat.dart';
+part of '../firechat.dart';
 
 /// [ChatUserRoom] is for documents of `/chat/rooms/{user-id}` collection.
 class ChatUserRoom {

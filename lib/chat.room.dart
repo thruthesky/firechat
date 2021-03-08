@@ -26,13 +26,10 @@ class ChatRoom extends ChatBase {
   ///
   /// [globalRoomChange] will be invoked when global chat room changes.
   ChatRoom({
-    @required String loginUserId,
     Function render,
     Function globalRoomChange,
   })  : _render = render,
-        _globalRoomChange = globalRoomChange {
-    ChatConfig.loginUserId = loginUserId;
-  }
+        _globalRoomChange = globalRoomChange;
 
   int _limit = 30;
 
@@ -86,20 +83,25 @@ class ChatRoom extends ChatBase {
 
   /// Enter chat room
   ///
-  /// If [hatch] is set to true, then it will always create new room.
+  /// If [hatch] is set to true, then it will always create new room even if you are talking to same person.
   /// null or empty string in [users] will be wiped out.
   Future<void> enter({String id, List<String> users, bool hatch = true}) async {
+    /// confusing with [this.id], so, it goes as `_id`.
     String _id = id;
+
+    if (loginUserUid == null) {
+      throw LOGIN_FIRST;
+    }
 
     if (users == null) users = [];
     // [users] has empty elem,ent, remove.
     users.removeWhere((element) => element == null || element == '');
     if (_id != null && users.length > 0) {
-      throw 'ONE_OF_ID_OR_USERS_MUST_BE_NULL';
+      throw BOTH_OF_ID_AND_USERS_HAVE_VALUE;
     }
 
     if (_id == null && users.length == 0) {
-      throw 'ONE_OF_ID_OR_USERS_MUST_HAVE_VALUE';
+      throw EMPTY_ID_AND_USERS;
     }
 
     if (_id != null) {
@@ -112,7 +114,8 @@ class ChatRoom extends ChatBase {
       global = await getGlobalRoom(_id);
     } else {
       // Add login user(uid) into room users.
-      users.add(loginUserId);
+      users.add(loginUserUid);
+      // Avoid duplicated users.
       users = users.toSet().toList();
       if (hatch) {
         // Always create new room
@@ -177,7 +180,7 @@ class ChatRoom extends ChatBase {
 
     final info = ChatGlobalRoom(
       users: users,
-      moderators: [loginUserId],
+      moderators: [loginUserUid],
       createdAt: FieldValue.serverTimestamp(),
     );
 
@@ -193,7 +196,7 @@ class ChatRoom extends ChatBase {
 
     global = ChatGlobalRoom.fromSnapshot(await doc.get());
 
-    await sendMessage(text: ChatProtocol.roomCreated, displayName: loginUserId);
+    await sendMessage(text: ChatProtocol.roomCreated, displayName: loginUserUid);
   }
 
   /// Notify chat room listener to re-render the screen.
@@ -316,7 +319,7 @@ class ChatRoom extends ChatBase {
     }
 
     Map<String, dynamic> message = {
-      'senderUid': loginUserId,
+      'senderUid': loginUserUid,
       'senderDisplayName': displayName,
       'senderPhotoURL': photoURL,
       'text': text,
@@ -413,7 +416,7 @@ class ChatRoom extends ChatBase {
     // print('newUserNames:');
     // print(users.values.toList());
     // TODO: display name.
-    await sendMessage(text: ChatProtocol.add, displayName: loginUserId, extra: {
+    await sendMessage(text: ChatProtocol.add, displayName: loginUserUid, extra: {
       'newUsers': users.values.toList(),
     });
   }
@@ -451,7 +454,7 @@ class ChatRoom extends ChatBase {
   Future<void> addModerator(String uid) async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
     List<String> moderators = _globalRoom.moderators;
-    if (moderators.contains(loginUserId) == false) throw YOU_ARE_NOT_MODERATOR;
+    if (moderators.contains(loginUserUid) == false) throw YOU_ARE_NOT_MODERATOR;
     if (_globalRoom.users.contains(uid) == false) throw MODERATOR_NOT_EXISTS_IN_USERS;
     moderators.add(uid);
     await globalRoomDoc(id).update({'moderators': moderators});
@@ -493,11 +496,11 @@ class ChatRoom extends ChatBase {
   /// then move the room information from /chat/info/room-list to /chat/info/deleted-room-list.
   Future<void> leave() async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
-    _globalRoom.users.remove(loginUserId);
+    _globalRoom.users.remove(loginUserUid);
 
     // Update last message of room users that the user is leaving.
     await sendMessage(
-        text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
+        text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
@@ -516,7 +519,7 @@ class ChatRoom extends ChatBase {
   Future<void> kickout(String uid, String userName) async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
 
-    if (_globalRoom.moderators.contains(loginUserId) == false) throw YOU_ARE_NOT_MODERATOR;
+    if (_globalRoom.moderators.contains(loginUserUid) == false) throw YOU_ARE_NOT_MODERATOR;
     if (_globalRoom.users.contains(uid) == false) throw USER_NOT_EXIST_IN_ROOM;
     _globalRoom.users.remove(uid);
 
@@ -524,7 +527,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
     await sendMessage(
-        text: ChatProtocol.leave, displayName: loginUserId, extra: {'userName': loginUserId});
+        text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
   }
 
   /// Returns a room of a user.
@@ -543,5 +546,5 @@ class ChatRoom extends ChatBase {
   ///
   /// Note that `getMyRoomInfo()` returns `ChatRoomInfo` while `myRoom()`
   /// returns document reference.
-  Future<ChatUserRoom> get lastMessage => getMyRoomInfo(loginUserId, id);
+  Future<ChatUserRoom> get lastMessage => getMyRoomInfo(loginUserUid, id);
 }

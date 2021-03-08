@@ -2,6 +2,11 @@
 
 Firebase chat package for Flutter
 
+# Reference
+
+- Most of the code is coming from [FireFlutter](https://github.com/thruthesky/fireflutter#chat).
+- See the [test code of FireFlutter](https://github.com/thruthesky/fireflutter/blob/main/test/chat.tests.v2.dart).
+
 # TODOs
 
 - Make chat room and chat list singleton.
@@ -22,6 +27,24 @@ Firebase chat package for Flutter
 
 - `crypto` is for encrypting user id list for a room id.
 
+# Firebase Auth
+
+- User must login Firebase before using any of firechat code.
+
+# Global Rooms and User Rooms
+
+- Global rooms are the room information documents that are saved under `/chat/global-rooms/list` collection.
+- User rooms are the documents that has a room information for a single user.
+- The differnces of global and user rooms are;
+
+  - A global room has room informations like admins, password(to enter the room), room title, blocked user list, and more of the room itself.
+  - A user room has information of the relation between the user and the room. Like no of new messages, last message of the room, etc.
+
+# Logic of Chat Room Create
+
+- Create global room
+- Send welcome messages to users (by creating user's room) in the global room.
+
 # Security Rules
 
 ```
@@ -29,18 +52,18 @@ Firebase chat package for Flutter
 
     /// Chat
     match /chat {
-      match /my-room-list/{uid}/{roomId} {
+      match /user-rooms/{uid}/{roomId} {
         // User can read his own chat room list.
         allow read: if request.auth.uid == uid;
         // Only chat room users can update the room info(last message) of (room list of) users who are in the same room.
         allow create, update: if request.auth.uid == uid
-        || request.auth.uid in get(/databases/$(database)/documents/chat/global/room-list/$(roomId)).data.users;
+        || request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users;
         allow delete: if request.auth.uid == uid;
       }
 
 
 
-      match /global/room-list/{roomId} {
+      match /global-rooms/list/{roomId} {
         // Only room users can read the room information.
         allow read: if request.auth.uid in resource.data.users;
         // Anyone can create room.
@@ -79,9 +102,9 @@ Firebase chat package for Flutter
 
       match /messages/{roomId}/{message} {
         // Room users can read room messages.
-        allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/global/room-list/$(roomId)).data.users;
+        allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users;
         // Room users can write his own message.
-        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/global/room-list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
+        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
       }
     }
 ```
@@ -99,4 +122,17 @@ roomList() {
 }
 
 room().listen(() { ... });
+```
+
+# Tests
+
+- Read the comments on top of `chat.test.dart` to know how to run test code.
+- Run the test code like below
+
+```dart
+import 'package:firechat/chat.test.dart';
+a.firebaseInitialized.listen((ready) { // when firebase initialized,
+  if (ready == false) return;
+  FireChatTest().roomCreateTest(); // call test.
+});
 ```

@@ -1,7 +1,8 @@
 part of './firechat.dart';
 
 class ChatBase {
-  String get loginUserId => ChatConfig.loginUserId;
+  String get loginUserUid =>
+      FirebaseAuth.instance.currentUser == null ? null : FirebaseAuth.instance.currentUser.uid;
   FirebaseFirestore get db => FirebaseFirestore.instance;
 
   int page = 0;
@@ -10,18 +11,18 @@ class ChatBase {
   /// The app should display 'no more message' to user.
   bool noMoreMessage = false;
 
-  /// Returns the room collection reference of `/chat/rooms/global`
+  /// Returns the global chat room collection
   ///
   ///
   CollectionReference get globalRoomListCol {
-    return db.collection('chat').doc('rooms').collection('global');
+    return db.collection('chat').doc('global-rooms').collection('list');
   }
 
-  /// Returns login user's room list collection `/chat/my-room-list/my-uid` reference.
+  /// Returns login user's room list collection `/chat/user-rooms/{my-uid}` reference.
   ///
   ///
   CollectionReference get myRoomListCol {
-    return userRoomListCol(loginUserId);
+    return userRoomListCol(loginUserUid);
   }
 
   /// Return the collection of messages of the room id.
@@ -32,7 +33,7 @@ class ChatBase {
   /// Returns my room list collection `/chat/rooms/{user-id}` reference.
   ///
   CollectionReference userRoomListCol(String userId) {
-    return db.collection('chat').doc('rooms').collection(userId);
+    return db.collection('chat').doc('user-rooms').collection(userId);
   }
 
   /// Returns my room (that has last message of the room) document

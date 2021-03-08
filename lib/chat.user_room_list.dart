@@ -4,7 +4,7 @@ part of './firechat.dart';
 ///
 /// This is a completely independent helper class to help to list login user's room list.
 /// You may rewrite your own helper class.
-class ChatMyRoomList extends ChatBase {
+class ChatUserRoomList extends ChatBase {
   Function __render;
 
   StreamSubscription _myRoomListSubscription;
@@ -21,13 +21,12 @@ class ChatMyRoomList extends ChatBase {
   /// My room list including room id.
   List<ChatUserRoom> rooms = [];
   String _order = "";
-  ChatMyRoomList({
+  ChatUserRoomList({
     @required Function render,
     @required String loginUserId,
     String order = "createdAt",
   })  : __render = render,
         _order = order {
-    ChatConfig.loginUserId = loginUserId;
     listenRoomList();
   }
 
@@ -52,7 +51,8 @@ class ChatMyRoomList extends ChatBase {
   /// - users array changes,
   /// - and other properties change.
   listenRoomList() {
-    _myRoomListSubscription = myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
+    _myRoomListSubscription =
+        myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
       fetched = true;
       _notify();
       snapshot.docChanges.forEach((DocumentChange documentChange) {

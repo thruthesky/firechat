@@ -1,4 +1,4 @@
-part of 'firechat.dart';
+part of '../firechat.dart';
 
 /// [ChatMessage] presents the chat message under
 /// `/chat/messages/{roomId}/{messageId}` collection.
@@ -41,7 +41,7 @@ class ChatMessage {
       senderPhotoURL: data['senderPhotoURL'],
       senderUid: data['senderUid'],
       text: data['text'],
-      isMine: data['senderUid'] == ChatConfig.loginUserId,
+      isMine: data['senderUid'] == ChatRoom.instance.loginUserUid,
       isImage: isImage,
     );
   }

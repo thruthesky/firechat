@@ -1,4 +1,4 @@
-part of './firechat.dart';
+part of '../firechat.dart';
 
 /// [ChatGloalRoom] is a model (extending [ChatBase]) that represents the chat room under `/chat-global` collection.
 /// All the chat room resides under this collection.
@@ -14,7 +14,7 @@ class ChatGlobalRoom extends ChatBase {
   String get otherUserId {
     // If there is no other user.
     return users.firstWhere(
-      (el) => el != loginUserId,
+      (el) => el != loginUserUid,
       orElse: () => null,
     );
   }

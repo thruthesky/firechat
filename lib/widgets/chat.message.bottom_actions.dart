@@ -17,7 +17,7 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
   bool sending = false;
 
   final textController = TextEditingController();
-  dynamic isMessageEdit = null;
+  dynamic isMessageEdit;
 
   // send a message to the room users
   sendMessage() async {

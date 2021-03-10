@@ -135,18 +135,22 @@ class ChatRoom extends ChatBase {
         _id = md5.convert(utf8.encode(uids)).toString();
         try {
           // Get global room to see if it exists
+          // print("======================== get room information ======================");
           global = await getGlobalRoom(_id);
+
+          // Base on the security rule the code below will not called even the room doesnt exist
+          // because it will throw an error of permission-denied if global-rooms/list/room_id doesnt exist
           // if not exists, create.
           if (global == null) {
+            // print("==================== global is null =========================");
             await ___create(id: _id, users: users);
           }
         } catch (e) {
-          // ! does this code is needed?
-          // ! when will the app be fallen in this code?
-          // ! When the room does not exists? and read fails?
           // If room does not exist(or it cannot read), then create.
+          // getGlobalRoom will throw error if room doesnt exist yet.
           if (e.code == 'permission-denied') {
             // continue to create room
+            // print("============== permission-denied ========================");
             await ___create(id: _id, users: users);
           } else {
             rethrow;

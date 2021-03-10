@@ -35,7 +35,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     Firebase.initializeApp().then((x) {
-      FireChatTest().chatWithMyself();
+      // FireChatTest().runAllTests();
+      // FireChatTest().chatWithMyself();
+      // FireChatTest().sendMessageTestA();
+      FireChatTest().sendMessageTestB();
     });
   }
 

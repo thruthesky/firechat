@@ -26,11 +26,15 @@ class FireChatTest {
   final String dEmail = 'dddd@test.com';
   final String password = '12345a';
 
+  final String textABC = 'ABC ROOM MESSAGE';
+
   runAllTests() async {
     await inputTest();
     await chatWithMyself();
     await chatMyselfWithHatch();
     await roomCreateTest();
+    await sendMessageTestA();
+    await sendMessageTestB();
 
     print('ERROR: [ $_countError ]');
   }
@@ -215,6 +219,100 @@ class FireChatTest {
     } catch (e) {
       print(e);
       failure('Must be success of chat with user b');
+    }
+  }
+
+  sendMessageTestA() async {
+    // login user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    // create/enter abc room
+    try {
+      await chat.enter(users: [b, c]);
+      ChatUserRoom room = await chat.userRoom;
+      isTrue(room.text == ChatProtocol.roomCreated, 'abc roomCreated');
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    try {
+      await chat.sendMessage(text: textABC, displayName: chat.loginUserUid);
+      final ChatUserRoom lastMessageA = await chat.userRoom;
+      isTrue(lastMessageA.text == textABC, 'Got last message for ABC chat room');
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    try {
+      // login user b
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+      await chat.enter(id: chat.id);
+      final ChatUserRoom lastMessageB = await chat.userRoom;
+      isTrue(lastMessageB.text == textABC, 'b Got last message fror abc room');
+    } catch (e) {
+      failure('Must be success of b login and got abc room: ');
+      print(e);
+    }
+
+    try {
+      // login user c
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+      await chat.enter(id: chat.id);
+      final ChatUserRoom lastMessageC = await chat.userRoom;
+      isTrue(lastMessageC.text == textABC, 'c login Got last message fror abc room');
+    } catch (e) {
+      failure('Must be success of c login and got message from abc room: ');
+      print(e);
+    }
+  }
+
+  // sending message with hatch option false
+  sendMessageTestB() async {
+    // login user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    // create/enter abc room
+    try {
+      await chat.enter(users: [b, c], hatch: false);
+      ChatUserRoom room = await chat.userRoom;
+      isTrue(room.text == ChatProtocol.roomCreated || room.text == textABC,
+          'hatch false abc roomCreated');
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    try {
+      await chat.sendMessage(text: textABC, displayName: chat.loginUserUid);
+      final ChatUserRoom lastMessageA = await chat.userRoom;
+      isTrue(lastMessageA.text == textABC, 'hatch false Got last message for ABC chat room');
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    try {
+      // login user b
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+      await chat.enter(users: [a, c], hatch: false);
+      final ChatUserRoom lastMessageB = await chat.userRoom;
+      isTrue(lastMessageB.text == textABC, 'hatch false b Got last message fror abc room');
+    } catch (e) {
+      failure('Must be success of b login and got abc room: ');
+      print(e);
+    }
+
+    try {
+      // login user c
+      await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+      await chat.enter(users: [a, b], hatch: false);
+      final ChatUserRoom lastMessageC = await chat.userRoom;
+      isTrue(lastMessageC.text == textABC, 'c login Got last message fror abc room');
+    } catch (e) {
+      failure('Must be success of c login and got message from abc room: ');
+      print(e);
     }
   }
 

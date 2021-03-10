@@ -224,7 +224,7 @@ class FireChatTest {
 
   int _countError = 0;
   failure(String message) {
-    print("[FAILURE] $message");
+    print("\n-\n[FAILURE] $message ---------------------------------------------\n-\n");
     _countError++;
   }
 

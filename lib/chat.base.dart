@@ -74,7 +74,7 @@ class ChatBase {
 
   /// Returns the room list info `/chat/room/list/{roomId}` document.
   ///
-  /// If the room does exists, it returns null.
+  /// If the room does not exists, it returns null.
   /// The return value has `id` as its room id.
   ///
   /// Todo move this method to `ChatRoom`

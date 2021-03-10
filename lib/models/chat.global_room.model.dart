@@ -28,6 +28,7 @@ class ChatGlobalRoom extends ChatBase {
     this.createdAt,
   });
 
+  /// If room does not exists, return null.
   factory ChatGlobalRoom.fromSnapshot(DocumentSnapshot snapshot) {
     if (snapshot.exists == false) return null;
     Map<String, dynamic> info = snapshot.data();

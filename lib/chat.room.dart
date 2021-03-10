@@ -134,11 +134,16 @@ class ChatRoom extends ChatBase {
         String uids = users.join('');
         _id = md5.convert(utf8.encode(uids)).toString();
         try {
+          // Get global room to see if it exists
           global = await getGlobalRoom(_id);
+          // if not exists, create.
           if (global == null) {
             await ___create(id: _id, users: users);
           }
         } catch (e) {
+          // ! does this code is needed?
+          // ! when will the app be fallen in this code?
+          // ! When the room does not exists? and read fails?
           // If room does not exist(or it cannot read), then create.
           if (e.code == 'permission-denied') {
             // continue to create room

@@ -10,10 +10,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/firechat.dart';
 
 class FireChatTest {
-  final String a = 'YWBpfbnvuPgYEUZnhKuaR1DtF7D2';
-  final String b = 'NrDUfFBQ2UhJosS0d9zKuQiViAR2';
-  final String c = '3ZvCelL3jVU9eV2OiBFa4Ti3Cwx2';
-  final String d = 'et5kxG7vgFcM2oOI9flQQbHkfTq2';
+  // final String a = 'YWBpfbnvuPgYEUZnhKuaR1DtF7D2';
+  // final String b = 'NrDUfFBQ2UhJosS0d9zKuQiViAR2';
+  // final String c = '3ZvCelL3jVU9eV2OiBFa4Ti3Cwx2';
+  // final String d = 'et5kxG7vgFcM2oOI9flQQbHkfTq2';
+
+  /// v1.test.firechat
+  final String a = '7kYRMUhRJGPV47u2hCDrauoHSMk1';
+  final String b = '4MB8M3mbLlQ9J70Mbp5BW5p3fnD2';
+  final String c = 'yUzkXHvNPTVgYiE21rn78aWURZF3';
+  final String d = 'FvLmXDDpUkfYvHlLnm61KuEDpGC2';
   final String aEmail = 'aaaa@test.com';
   final String bEmail = 'bbbb@test.com';
   final String cEmail = 'cccc@test.com';

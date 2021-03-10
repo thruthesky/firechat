@@ -156,7 +156,8 @@ class ChatRoom extends ChatBase {
     // Listening current global room for changes and update.
     if (_globalRoomSubscription != null) _globalRoomSubscription.cancel();
 
-    _globalRoomSubscription = globalRoomDoc(_id).snapshots().listen((event) {
+    // _globalRoomSubscription = globalRoomDoc(_id).snapshots().listen((event) {
+    _globalRoomSubscription = globalRoomDoc(global.roomId).snapshots().listen((event) {
       global = ChatGlobalRoom.fromSnapshot(event);
       if (_globalRoomChange != null) {
         _globalRoomChange();

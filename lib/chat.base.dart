@@ -15,7 +15,7 @@ class ChatBase {
   ///
   ///
   CollectionReference get globalRoomListCol {
-    return db.collection('chat').doc('global').collection('room-list');
+    return db.collection('chat').doc('global-rooms').collection('list');
   }
 
   /// Returns login user's room list collection `/chat/my-room-list/{my-uid}` reference.
@@ -30,10 +30,10 @@ class ChatBase {
     return db.collection('chat').doc('messages').collection(roomId);
   }
 
-  /// Returns my room list collection `/chat/my-room-list/{user-id}` reference.
+  /// Returns my room list collection `/chat/user-rooms/{uid}` reference.
   ///
   CollectionReference userRoomListCol(String userId) {
-    return db.collection('chat').doc('my-room-list').collection(userId);
+    return db.collection('chat').doc('user-rooms').collection(userId);
   }
 
   /// Returns my room (that has last message of the room) document
@@ -42,7 +42,7 @@ class ChatBase {
     return userRoomListCol(userId).doc(roomId);
   }
 
-  /// Returns `/chat/global/roomList/{roomId}` document reference
+  /// Returns `/chat/global-rooms/list/{roomId}` document reference
   ///
   DocumentReference globalRoomDoc(String roomId) {
     return globalRoomListCol.doc(roomId);
@@ -50,7 +50,7 @@ class ChatBase {
 
   /// Returns document reference of my room (that has last message of the room)
   ///
-  /// `/chat/my-room-list/my-id/{roomId}`
+  /// `/chat/user-rooms/uid/{roomId}`
   DocumentReference myRoom(String roomId) {
     return myRoomListCol.doc(roomId);
   }

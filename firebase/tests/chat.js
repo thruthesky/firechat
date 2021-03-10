@@ -5,7 +5,8 @@ const { assertFails, assertSucceeds } = require("@firebase/rules-unit-testing");
 
 // Preset test data
 
-const MY_PROJECT_ID = "itsuda50"; // real firebase project id.
+// const MY_PROJECT_ID = "itsuda50"; // real firebase project id.
+const MY_PROJECT_ID = "firechat-test-v1"; // test firebase project id.
 const myUid = "myUid";
 const otherUid = "otherUid";
 const myAuth = { uid: myUid, email: "my-email@gmail.com" };

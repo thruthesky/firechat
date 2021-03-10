@@ -48,22 +48,25 @@ Firebase chat package for Flutter
 # Security Rules
 
 ```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
 
 
     /// Chat
     match /chat {
-      match /user-rooms/{uid}/{roomId} {
+      match /userRooms/{uid}/{roomId} {
         // User can read his own chat room list.
         allow read: if request.auth.uid == uid;
         // Only chat room users can update the room info(last message) of (room list of) users who are in the same room.
         allow create, update: if request.auth.uid == uid
-        || request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users;
+        || request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users;
         allow delete: if request.auth.uid == uid;
       }
 
 
 
-      match /global-rooms/list/{roomId} {
+      match /globalRooms/roomList/{roomId} {
         // Only room users can read the room information.
         allow read: if request.auth.uid in resource.data.users;
         // Anyone can create room.
@@ -102,11 +105,14 @@ Firebase chat package for Flutter
 
       match /messages/{roomId}/{message} {
         // Room users can read room messages.
-        allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users;
+        // allow read: if false;
+        allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users;
         // Room users can write his own message.
-        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
+        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
       }
     }
+  }
+}
 ```
 
 # Developer Guideline

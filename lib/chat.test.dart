@@ -21,12 +21,17 @@ class FireChatTest {
   final String password = '12345a';
 
   runAllTests() async {
+    await inputTest();
+    await chatWithMyself();
+    await chatMyselfWithHatch();
     await roomCreateTest();
 
     print('ERROR: [ $_countError ]');
   }
 
-  roomCreateTest() async {
+  /// @todo begin from here https://github.com/thruthesky/fireflutter-firebase Unit Test on Firebase Security Rules.
+
+  inputTest() async {
     final chat = ChatRoom.instance;
 
     // logout
@@ -58,30 +63,54 @@ class FireChatTest {
     } catch (e) {
       isTrue(e == BOTH_OF_ID_AND_USERS_HAVE_VALUE, 'Expected: ' + BOTH_OF_ID_AND_USERS_HAVE_VALUE);
     }
+  }
 
+  chatWithMyself() async {
+    final chat = ChatRoom.instance;
+
+    // login user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+
+    // return;
     // chat with my self
     try {
       await chat.enter(users: [chat.loginUserUid]);
-      ChatUserRoom info = await chat.lastMessage;
-      isTrue(info.text == ChatProtocol.roomCreated, 'Expected: ' + ChatProtocol.roomCreated);
-      isTrue(info.senderUid == chat.loginUserUid,
-          'Expected: ' + info.senderUid + " == " + chat.loginUserUid);
-      isTrue(info.id == chat.global.roomId, 'Expected: ' + info.id + " == " + chat.global.roomId);
+      ChatUserRoom room = await chat.userRoom;
+      isTrue(room.text == ChatProtocol.roomCreated, 'Expected: ' + ChatProtocol.roomCreated);
+      isTrue(room.senderUid == chat.loginUserUid,
+          'Expected: ' + room.senderUid + " == " + chat.loginUserUid);
+      isTrue(room.id == chat.global.roomId, 'Expected: ' + room.id + " == " + chat.global.roomId);
       isTrue(chat.users.length == 1, 'Expected: ' + "${chat.users.length} == 1");
       isTrue(chat.users.first == chat.loginUserUid, 'Expected: ' + "${chat.loginUserUid}");
+    } catch (e) {
+      failure('Must be success of but: ');
+      print(e);
+    }
+  }
 
+  chatMyselfWithHatch() async {
+    final chat = ChatRoom.instance;
+    // login user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    try {
+      await chat.enter(users: [chat.loginUserUid]);
       final oldChatId = chat.id;
       await chat.enter(users: [chat.loginUserUid]);
-      isTrue(oldChatId != chat.id, 'Expected: not equal ' + "${oldChatId} != ${chat.id}");
+      isTrue(oldChatId != chat.id, 'Expected: not equal ' + "$oldChatId != ${chat.id}");
 
+      // hatch test
       await chat.enter(users: [chat.loginUserUid], hatch: false);
       final newChatId = chat.id;
       await chat.enter(users: [chat.loginUserUid], hatch: false);
-      isTrue(newChatId == chat.id, 'Expected: equal ' + "${newChatId} == ${chat.id}");
+      isTrue(newChatId == chat.id, 'Expected: equal ' + "$newChatId == ${chat.id}");
     } catch (e) {
+      failure('Must be success of but: ');
       print(e);
-      failure('Must be success of : ');
     }
+  }
+
+  roomCreateTest() async {
+    final chat = ChatRoom.instance;
 
     // chat with user b
     String abId;
@@ -97,13 +126,14 @@ class FireChatTest {
       isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
+      // Save chat room id for test later.
       abId = chat.id;
     } catch (e) {
       print(e);
       failure('Must be success of chat with user b');
     }
 
-    // login with user b and chat user a
+    // b login and chat with user a
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
     try {
       await chat.enter(users: [a]);
@@ -111,7 +141,8 @@ class FireChatTest {
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
 
-      // hatch false user a
+      // hatch false with user a.
+      // Expect: use existing chat room.
       await chat.enter(users: [a], hatch: false);
       isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
@@ -119,6 +150,7 @@ class FireChatTest {
       isTrue(abId == chat.id, 'Expected: ' + "hatch false option $abId = ${chat.id}");
 
       // hatch false user a and b
+      // Expect: use existing chat room.
       await chat.enter(users: [a, b], hatch: false);
       isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
@@ -129,7 +161,9 @@ class FireChatTest {
       failure('Must be success of chat with user b');
     }
 
+    // a login
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+
     try {
       await chat.enter(users: [a, b, c], hatch: false);
       final abcId = chat.id;
@@ -140,38 +174,38 @@ class FireChatTest {
 
       // hatch false user a enter room b,c
       await chat.enter(users: [b, c], hatch: false);
-      final alogin_bcId = chat.id;
+      final aLoginWithBC = chat.id;
       isTrue(chat.users.length == 3, 'Expected: ' + "${chat.users.length} == 3");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
       isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
-      isTrue(abcId == alogin_bcId, 'Expected: ' + "hatch false option $abcId = $alogin_bcId");
+      isTrue(abcId == aLoginWithBC, 'Expected: ' + "hatch false option $abcId = $aLoginWithBC");
 
       // hatch false user a,b,c,d
       await chat.enter(users: [a, b, c, d], hatch: false);
-      final alogin_bcdId = chat.id;
+      final aLgoinWithBCD = chat.id;
       isTrue(chat.users.length == 4, 'Expected: ' + "${chat.users.length} == 4");
       isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
       isTrue(chat.users.contains(d), 'Expected: ' + "$d exist on user list");
       // hatch false user [a, a, b, b, c, c, d]
       await chat.enter(users: [a, a, b, b, c, c, d], hatch: false);
-      final alogin_aabbccd = chat.id;
+      final aLoginWithAABBCCD = chat.id;
       isTrue(chat.users.length == 4, 'Expected: ' + "${chat.users.length} == 4");
       isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
       isTrue(chat.users.contains(d), 'Expected: ' + "$d exist on user list");
-      isTrue(alogin_bcdId == alogin_aabbccd,
-          'Expected: ' + "hatch false option $alogin_bcdId = $alogin_aabbccd");
+      isTrue(aLgoinWithBCD == aLoginWithAABBCCD,
+          'Expected: ' + "hatch false option $aLgoinWithBCD = $aLoginWithAABBCCD");
 
       // hatch false user [b, c, a, c, d, a, b]
       await chat.enter(users: [b, c, a, c, d, a, b], hatch: false);
-      final alogin_bcacdab = chat.id;
+      final aLoginWithBCACDAB = chat.id;
       isTrue(chat.users.length == 4, 'Expected: ' + "${chat.users.length} == 4");
       isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
       isTrue(chat.users.contains(d), 'Expected: ' + "$d exist on user list");
-      isTrue(alogin_bcdId == alogin_bcacdab,
-          'Expected: ' + "hatch false option $alogin_bcdId = $alogin_bcacdab");
-      isTrue(alogin_aabbccd == alogin_bcacdab,
-          'Expected: ' + "hatch false option $alogin_aabbccd = $alogin_bcacdab");
+      isTrue(aLgoinWithBCD == aLoginWithBCACDAB,
+          'Expected: ' + "hatch false option $aLgoinWithBCD = $aLoginWithBCACDAB");
+      isTrue(aLoginWithAABBCCD == aLoginWithBCACDAB,
+          'Expected: ' + "hatch false option $aLoginWithAABBCCD = $aLoginWithBCACDAB");
     } catch (e) {
       print(e);
       failure('Must be success of chat with user b');

@@ -1,4 +1,4 @@
-package com.example.example
+package v1.test.firechat
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -47,72 +47,38 @@ Firebase chat package for Flutter
 
 # Security Rules
 
+- It's in `firebase/firestore.rules`
+
+## Test on Security Rules
+
+- First setup Firebase project.
+
+- Then, install Firebase tools and login.
+  `% npm install -g firebase-tools`
+
+- Then, log into Firebase
+  `% firebase login`
+
+- Then, install npm for testing.
+
 ```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+% cd firebase
+% npm init -y
+% npm i -D @firebase/rules-unit-testing
+% npm i -D firebase-admin
+% npm i -D mocha
+```
 
+- Then, run Firestore emualtor
 
-    /// Chat
-    match /chat {
-      match /userRooms/{uid}/{roomId} {
-        // User can read his own chat room list.
-        allow read: if request.auth.uid == uid;
-        // Only chat room users can update the room info(last message) of (room list of) users who are in the same room.
-        allow create, update: if request.auth.uid == uid
-        || request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users;
-        allow delete: if request.auth.uid == uid;
-      }
+```sh
+firebase emulators:start --only firestore   ; run firebase emulator
+```
 
+- Then, run the test
 
-
-      match /globalRooms/roomList/{roomId} {
-        // Only room users can read the room information.
-        allow read: if request.auth.uid in resource.data.users;
-        // Anyone can create room.
-        allow create: if true;
-        // Room users can add another users and none of them must not be in `blockedUsers`
-        // User cannot remove other user but himself. and cannot update other fields.
-        // Moderators can remove a user and can update any fields.
-        allow update: if
-        (
-          (
-          request.auth.uid in resource.data.users
-          && onlyUpdating(['users'])
-          && request.resource.data.users.hasAll(resource.data.users.removeAll([request.auth.uid])) // remove my self or add users.
-          )
-          ||
-          // Moderators can edit all the fields. This includes
-          // - removing users by updating users: []
-          // - blocking users by updating blockedUsers: []
-          // - adding another user to moderator by updating moderators: []
-          // - and all the work.
-          (
-          'moderators' in resource.data && request.auth.uid in resource.data.moderators
-          )
-        )
-        &&
-        (
-          !('blockedUsers' in resource.data)
-          ||
-          resource.data.blockedUsers == null
-          ||
-          !(request.resource.data.users.hasAny(resource.data.blockedUsers))
-        )
-        // ! ('blockedUsers' in resource.data && request.resource.data.users.hasAny(resource.data.blockedUsers)) // stop adding users who are in block list.
-        ;
-      }
-
-      match /messages/{roomId}/{message} {
-        // Room users can read room messages.
-        // allow read: if false;
-        allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users;
-        // Room users can write his own message.
-        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/globalRooms/roomList/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
-      }
-    }
-  }
-}
+```sh
+./node_modules/.bin/mocha tests/chat.js
 ```
 
 # Developer Guideline

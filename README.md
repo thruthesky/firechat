@@ -75,6 +75,8 @@ Firebase chat package for Flutter
 firebase emulators:start --only firestore   ; run firebase emulator
 ```
 
+- Then, edit `MY_PROJECT_ID` with your Firebase project ID in `chat.js`.
+
 - Then, run the test
 
 ```sh

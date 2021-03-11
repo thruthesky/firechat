@@ -322,7 +322,7 @@ class FireChatTest {
     final chat = ChatRoom.instance;
     // create/enter abc room
     try {
-      await chat.enter(users: [b, c]);
+      await chat.enter(users: [b, c]); //
       ChatUserRoom room = await chat.userRoom;
       isTrue(room.text == ChatProtocol.roomCreated, 'abc roomCreated');
       await chat.unsubscribe();
@@ -334,10 +334,19 @@ class FireChatTest {
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
 
     try {
-      await chat.enter(id: chat.id);
-      await chat.unsubscribe();
-      await chat.leave();
-      isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
+      await chat.enter(id: chat.id); //
+    } catch (e) {
+      failure('Must success on enter(): but;');
+      print(e);
+    }
+    try {
+      isTrue(chat.users.length == 3, 'Expected: Three in the room. ' + "${chat.users.length} == 3");
+      await chat.leave(); //
+      final got = await chat.currentRoom.get();
+      isTrue(got.exists == false, 'The room had been deleted after leave()');
+
+      isTrue(chat.users.length == 2,
+          'Expected: Should be two in the room. ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
       isTrue(chat.users.contains(c), 'Expected: ' + "$c doesnt exist on user list");

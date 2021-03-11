@@ -147,7 +147,7 @@ class ChatRoom extends ChatBase {
           }
         } catch (e) {
           // If room does not exist(or it cannot read), then create.
-          // getGlobalRoom(id) will throw error if room doesnt exist yet.
+          // getGlobalRoom(id) will throw error if room doesnt exist yet, and it will fall down to `permission-denied`.
           if (e.code == 'permission-denied') {
             // continue to create room
             // print("============== permission-denied ========================");
@@ -166,18 +166,26 @@ class ChatRoom extends ChatBase {
     if (_globalRoomSubscription != null) _globalRoomSubscription.cancel();
 
     // _globalRoomSubscription = globalRoomDoc(_id).snapshots().listen((event) {
+    // print('------------> subscribe global update: ${global.roomId}');
     _globalRoomSubscription = globalRoomDoc(global.roomId).snapshots().listen((event) {
       global = ChatGlobalRoom.fromSnapshot(event);
+      // print(' ------------> global updated; ');
+      print(global);
       if (_globalRoomChange != null) {
         _globalRoomChange();
       }
     });
 
-    // Listening current room in my room list.
+    // Listening current room document change event (in my room list).
     //
-    // This will be notify chat room listener when chat room title changes, or new users enter, etc.
+    // This will be notify the listener when chat room title changes, or new users enter, etc.
     if (_currentRoomSubscription != null) _currentRoomSubscription.cancel();
     _currentRoomSubscription = currentRoom.snapshots().listen((DocumentSnapshot doc) {
+      if (doc.exists == false) {
+        // User left the room. So the room does not exists.
+        return;
+      }
+
       // If the user got a message from a chat room where the user is currently in,
       // then, set `newMessages` to 0.
       final data = ChatUserRoom.fromSnapshot(doc);
@@ -313,10 +321,32 @@ class ChatRoom extends ChatBase {
     });
   }
 
+  /// Unsubscribe room event listeners
+  ///
+  /// Especially when unit testing, multiple users log in/out at the same time
+  /// and permission erros will happen here by listening other user's document.
+  ///
+  ///
+  /// Must be set to null since these are checked if null before re-subscriptoin.
+  ///
+  /// When a user enters a chat room, the app will listen,
+  /// 1. the chat message colltion,
+  /// 2. the current room information,
+  /// 3. the global room infromation
+  /// And right before the user leave the room, it should be unsubscribed.
   unsubscribe() {
-    _chatRoomSubscription.cancel();
-    _currentRoomSubscription.cancel();
-    _globalRoomSubscription.cancel();
+    if (_chatRoomSubscription != null) {
+      _chatRoomSubscription.cancel();
+      _chatRoomSubscription = null;
+    }
+    if (_currentRoomSubscription != null) {
+      _currentRoomSubscription.cancel();
+      _currentRoomSubscription = null;
+    }
+    if (_globalRoomSubscription != null) {
+      _globalRoomSubscription.cancel();
+      _globalRoomSubscription = null;
+    }
   }
 
   /// Send chat message to the users in the room
@@ -514,19 +544,22 @@ class ChatRoom extends ChatBase {
   /// TODO When a user(or a moderator) leaves the room and there is no user left in the room,
   /// then move the room information from /chat/info/room-list to /chat/info/deleted-room-list.
   Future<void> leave() async {
+    //
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
-    _globalRoom.users.remove(loginUserUid);
 
     // Update last message of room users that the user is leaving.
     await sendMessage(
         text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
 
+    /// remove the login user from [_globalRoom.users] users array.
+    _globalRoom.users.remove(loginUserUid);
+
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
-    // If I am the one who is willingly leave the room, then remove the
-    // room in my-room-list.
-    // print(chatMyRoom(roomId).path);
+    // Delete the room that the user is leaving from. (Not the global room.)
+    // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
+    unsubscribe();
     await myRoom(id).delete();
   }
 

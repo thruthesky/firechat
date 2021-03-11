@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     Firebase.initializeApp().then((x) {
-      // FireChatTest().runAllTests();
+      FireChatTest().runAllTests();
       // FireChatTest().chatWithMyself();
       // FireChatTest().sendMessageTestA();
       // FireChatTest().sendMessageTestB();
@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // FireChatTest().addModeratorTest();
       // FireChatTest().removeModeratorTest();
       // FireChatTest().blockTest();
-      FireChatTest().kickoutTest();
+      // FireChatTest().kickoutTest();
     });
   }
 

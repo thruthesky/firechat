@@ -29,20 +29,21 @@ class FireChatTest {
   final String textABC = 'ABC ROOM MESSAGE';
 
   runAllTests() async {
-    await inputTest();
-    await chatWithMyself();
-    await chatMyselfWithHatch();
-    await roomCreateTest();
-    await sendMessageTestA();
-    await sendMessageTestB();
-    await leaveTest(); // double check the logic since it shows different result from time to time
-
-    await userInvitationTest();
+    // await inputTest();
+    // await chatWithMyself();
+    // await chatMyselfWithHatch();
+    // await roomCreateTestA();
+    await roomCreateTestB();
+    // await roomCreateTestHatchFalse();
+    // await sendMessageTestA();
+    // await sendMessageTestB();
+    // await leaveTest();
+    // await userInvitationTest();
     // await addModeratorTest();
     // await removeModeratorTest();
     // await blockTest();
     // await kickoutTest();
-    print('ERROR: [ $_countError ]');
+    print('TEST ERROR:::::: [ $_countError ]');
   }
 
   /// @todo begin from here https://github.com/thruthesky/fireflutter-firebase Unit Test on Firebase Security Rules.
@@ -82,12 +83,10 @@ class FireChatTest {
   }
 
   chatWithMyself() async {
-    final chat = ChatRoom.instance;
-
     // login user a
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
 
-    // return;
     // chat with my self
     try {
       await chat.enter(users: [chat.loginUserUid]);
@@ -102,6 +101,7 @@ class FireChatTest {
       failure('Must be success of but: ');
       print(e);
     }
+    chat.unsubscribe();
   }
 
   chatMyselfWithHatch() async {
@@ -125,25 +125,18 @@ class FireChatTest {
     }
   }
 
-  roomCreateTest() async {
+  roomCreateTestA() async {
     final chat = ChatRoom.instance;
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
 
     // chat with user b
-    String abId;
     try {
       await chat.enter(users: [b]);
       isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
       isTrue(chat.users.contains(c) == false, 'Expected: ' + "$c doesnt exist on user list");
-
-      // hatch false
-      await chat.enter(users: [b], hatch: false);
-      isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
-      isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
-      isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
-      // Save chat room id for test later.
-      abId = chat.id;
+      chat.unsubscribe();
     } catch (e) {
       print(e);
       failure('Must be success of chat with user b');
@@ -152,11 +145,37 @@ class FireChatTest {
     // b login and chat with user a
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
     try {
-      await chat.enter(users: [a]);
+      await chat.enter(users: [c]);
       isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
-      isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
-      isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
+      isTrue(chat.users.contains(b), 'Expected: ' + "$a exist on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
+      chat.unsubscribe();
+    } catch (e) {
+      print(e);
+      failure('Must be success of chat b with user c');
+    }
+  }
 
+  roomCreateTestB() async {
+    final chat = ChatRoom.instance;
+
+    String abId;
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    try {
+      // hatch false
+      await chat.enter(users: [a, b], hatch: false);
+      abId = chat.id;
+      isTrue(chat.users.length == 2, 'Expected: ' + "hatch false ${chat.users.length} == 2");
+      isTrue(chat.users.contains(a), 'Expected: ' + "hatch false $a exist on user list");
+      isTrue(chat.users.contains(b), 'Expected: ' + "hatch false $b exist on user list");
+    } catch (e) {
+      print(e);
+      failure('Must be success of chat with user b hatch false');
+    }
+
+    // b login and chat with user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+    try {
       // hatch false with user a.
       // Expect: use existing chat room.
       await chat.enter(users: [a], hatch: false);
@@ -164,6 +183,7 @@ class FireChatTest {
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
       isTrue(abId == chat.id, 'Expected: ' + "hatch false option $abId = ${chat.id}");
+      chat.unsubscribe();
 
       // hatch false user a and b
       // Expect: use existing chat room.
@@ -172,14 +192,18 @@ class FireChatTest {
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b), 'Expected: ' + "$b exist on user list");
       isTrue(abId == chat.id, 'Expected: ' + "hatch false option $abId = ${chat.id}");
+      chat.unsubscribe();
     } catch (e) {
       print(e);
       failure('Must be success of chat with user b');
     }
+  }
 
+  roomCreateTestHatchFalse() async {
     // a login
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
 
+    final chat = ChatRoom.instance;
     try {
       await chat.enter(users: [a, b, c], hatch: false);
       final abcId = chat.id;
@@ -272,6 +296,7 @@ class FireChatTest {
       failure('Must be success of c login and got message from abc room: ');
       print(e);
     }
+    chat.unsubscribe();
   }
 
   // sending message with hatch option false
@@ -293,7 +318,7 @@ class FireChatTest {
     try {
       await chat.sendMessage(text: textABC, displayName: chat.loginUserUid);
       final ChatUserRoom lastMessageA = await chat.userRoom;
-      isTrue(lastMessageA.text == textABC, 'hatch false Got last message for ABC chat room');
+      isTrue(lastMessageA.text == textABC, 'hatch false last message for ABC chat room');
     } catch (e) {
       failure('Must be success of create abc room: ');
       print(e);
@@ -320,6 +345,7 @@ class FireChatTest {
       failure('Must be success of c login and got message from abc room: ');
       print(e);
     }
+    chat.unsubscribe();
   }
 
   leaveTest() async {
@@ -372,7 +398,7 @@ class FireChatTest {
     try {
       // enter chat room abc
       await chat.enter(id: chat.id);
-      isTrue(chat.users.length == 2, 'Expected: Three in the room. ' + "${chat.users.length} == 2");
+      isTrue(chat.users.length == 2, 'Expected: two in the room. ' + "${chat.users.length} == 2");
       final lastMessage = await chat.userRoom;
       isTrue(lastMessage.text == ChatProtocol.leave, 'leave checked by a');
       isTrue(chat.users.length == 2,
@@ -434,6 +460,8 @@ class FireChatTest {
       isTrue(e == ROOM_NOT_EXISTS, 'room not exist after leave');
       print(e);
     }
+
+    chat.unsubscribe();
   }
 
   userInvitationTest() async {
@@ -480,6 +508,8 @@ class FireChatTest {
     isTrue(cRoom.users.contains(b) == false, 'B is NOT included');
     isTrue(cRoom.users.contains(c), 'C is included');
     isTrue(cRoom.users.contains(d), 'D is included');
+
+    chat.unsubscribe();
   }
 
   addModeratorTest() async {
@@ -513,8 +543,7 @@ class FireChatTest {
       isTrue(e == YOU_ARE_NOT_MODERATOR, 'Only moderator can add another moderator');
     }
 
-    // room = await chat.getGlobalRoom(chat.id);
-    // print(room);
+    chat.unsubscribe();
   }
 
   removeModeratorTest() async {
@@ -532,6 +561,8 @@ class FireChatTest {
     isTrue(room.moderators.length == 1, '2 moderators are in the room');
     isTrue(room.moderators.contains(a), 'A is included as moderator');
     isTrue(room.moderators.contains(b) == false, 'B is NOT included as moderator');
+
+    chat.unsubscribe();
   }
 
   blockTest() async {
@@ -550,6 +581,7 @@ class FireChatTest {
     } catch (e) {
       isTrue(e == ONE_OF_USERS_ARE_BLOCKED, 'One of users are in block list');
     }
+    chat.unsubscribe();
   }
 
   kickoutTest() async {

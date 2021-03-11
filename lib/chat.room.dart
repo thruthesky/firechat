@@ -170,7 +170,7 @@ class ChatRoom extends ChatBase {
     _globalRoomSubscription = globalRoomDoc(global.roomId).snapshots().listen((event) {
       global = ChatGlobalRoom.fromSnapshot(event);
       // print(' ------------> global updated; ');
-      print(global);
+      // print(global);
       if (_globalRoomChange != null) {
         _globalRoomChange();
       }
@@ -237,7 +237,7 @@ class ChatRoom extends ChatBase {
     page++;
     if (page == 1) {
       final ref = myRoom(global.roomId);
-      print('ref: ${ref.path}');
+      // print('ref: ${ref.path}');
       await ref.set({'newMessages': 0}, SetOptions(merge: true));
     }
 
@@ -252,8 +252,8 @@ class ChatRoom extends ChatBase {
       q = q.startAfter([messages.first['createdAt']]);
     }
 
-    print('myUid: $loginUserUid');
-    print('q.path: ${messagesCol(global.roomId).path}');
+    // print('myUid: $loginUserUid');
+    // print('q.path: ${messagesCol(global.roomId).path}');
     _chatRoomSubscription = q.snapshots().listen((snapshot) {
       // print('fetchMessage() -> done: _page: $_page');
       // Block loading previous messages for some time.
@@ -556,10 +556,9 @@ class ChatRoom extends ChatBase {
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
-
-    // Delete the room that the user is leaving from. (Not the global room.)
     // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
     unsubscribe();
+    // Delete the room that the user is leaving from. (Not the global room.)
     await myRoom(id).delete();
   }
 

@@ -39,7 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
       // FireChatTest().chatWithMyself();
       // FireChatTest().sendMessageTestA();
       // FireChatTest().sendMessageTestB();
-      FireChatTest().leaveTest();
+      // FireChatTest().leaveTest();
+      // FireChatTest().userInvitationTest();
+      // FireChatTest().addModeratorTest();
+      // FireChatTest().removeModeratorTest();
+      // FireChatTest().blockTest();
+      FireChatTest().kickoutTest();
     });
   }
 

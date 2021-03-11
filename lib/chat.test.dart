@@ -35,7 +35,13 @@ class FireChatTest {
     await roomCreateTest();
     await sendMessageTestA();
     await sendMessageTestB();
+    await leaveTest(); // double check the logic since it shows different result from time to time
 
+    await userInvitationTest();
+    // await addModeratorTest();
+    // await removeModeratorTest();
+    // await blockTest();
+    // await kickoutTest();
     print('ERROR: [ $_countError ]');
   }
 
@@ -331,49 +337,252 @@ class FireChatTest {
       print(e);
     }
 
+    // login user b
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
-
+    // user b enter chat room abc
     try {
       await chat.enter(id: chat.id); //
     } catch (e) {
       failure('Must success on enter(): but;');
       print(e);
     }
+
     try {
+      // before user leave chat room abc
       isTrue(chat.users.length == 3, 'Expected: Three in the room. ' + "${chat.users.length} == 3");
-      await chat.leave(); //
-      final got = await chat.currentRoom.get();
-      isTrue(got.exists == false, 'The room had been deleted after leave()');
+      // user b leave chat room abc
+      await chat.leave();
+      // after leave check if myroom is still exist
+      // final got = await chat.currentRoom.get();
+      // isTrue(got.exists == false, 'The room had been deleted after leave()');
 
       isTrue(chat.users.length == 2,
           'Expected: Should be two in the room. ' + "${chat.users.length} == 2");
       isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
       isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
-      isTrue(chat.users.contains(c), 'Expected: ' + "$c doesnt exist on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
     } catch (e) {
       failure('Must be success of create abc room: ');
       print(e);
     }
 
-    // await _ff.loginOrRegister(email: aEmail, password: password);
-    // final chatA = ChatRoom(inject: _ff);
-    // await chatA.enter(id: chat.id);
-    // final lastMessageA = await chatA.lastMessage;
-    // isTrue(lastMessageA.text == ChatProtocol.leave, 'leave checked by a');
+    // user a login again
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
 
-    // await _ff.loginOrRegister(email: cEmail, password: password);
-    // final chatC = ChatRoom(inject: _ff);
-    // await chatC.enter(id: chat.id);
-    // final lastMessageC = await chatC.lastMessage;
-    // isTrue(lastMessageC.text == ChatProtocol.leave, 'leave checked by c');
+    try {
+      // enter chat room abc
+      await chat.enter(id: chat.id);
+      isTrue(chat.users.length == 2, 'Expected: Three in the room. ' + "${chat.users.length} == 2");
+      final lastMessage = await chat.userRoom;
+      isTrue(lastMessage.text == ChatProtocol.leave, 'leave checked by a');
+      isTrue(chat.users.length == 2,
+          'Expected: Should be two in the room. ' + "${chat.users.length} == 2");
+      isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c doesnt exist on user list");
+      isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
+    } catch (e) {
+      failure('Must be success of a checking last message that b has left the room: ');
+      print(e);
+    }
 
-    // await _ff.loginOrRegister(email: bEmail, password: password);
-    // try {
-    //   await chatB.lastMessage;
-    //   isTrue(false, 'room must not exist after leave');
-    // } catch (e) {
-    //   isTrue(e == ROOM_NOT_EXISTS, 'room not exist after leave');
-    // }
+    try {
+      // before user leave chat room abc
+      isTrue(
+          chat.users.length == 2, 'Expected: a and c in the room. ' + "${chat.users.length} == 2");
+      // user a leave chat room abc
+      await chat.leave();
+      // after leave check if myroom is still exist
+      final got = await chat.currentRoom.get();
+      isTrue(got.exists == false, 'The room had been deleted after leave()');
+
+      print(chat.users);
+      isTrue(chat.users.length == 1,
+          'Expected: Should be two in the room. ' + "${chat.users.length} == 1");
+      isTrue(chat.users.contains(a) == false, 'Expected: ' + "$a doesnt exist on user list");
+      isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
+    } catch (e) {
+      failure('Must be success of A leaving the room abc: ');
+      print(e);
+    }
+
+    // user c login
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+
+    try {
+      // enter chat room abc
+      await chat.enter(id: chat.id);
+      isTrue(chat.users.length == 1, 'Expected: One in the room. ' + "${chat.users.length} == 1");
+      final lastMessage = await chat.userRoom;
+      isTrue(lastMessage.text == ChatProtocol.leave, 'leave checked by c');
+      isTrue(chat.users.length == 1,
+          'Expected: Should be one in the room. ' + "${chat.users.length} == 1");
+      isTrue(chat.users.contains(a) == false, 'Expected: ' + "$a doesnt exist on user list");
+      isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c exist on user list");
+      await chat.unsubscribe();
+    } catch (e) {
+      failure('Must be success of c checking last message that b and a has left the room: ');
+      print(e);
+    }
+
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    try {
+      final got = await chat.currentRoom.get();
+      isTrue(got.exists == false, 'The room had been deleted after leave()');
+    } catch (e) {
+      isTrue(e == ROOM_NOT_EXISTS, 'room not exist after leave');
+      print(e);
+    }
+  }
+
+  userInvitationTest() async {
+    // user c login
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    await chat.enter(users: [a]);
+    await chat.addUser({b: 'B'});
+    final lastMassage = await chat.userRoom;
+    isTrue(lastMassage.text == ChatProtocol.add, 'b added');
+    isTrue(lastMassage.newUsers.length == 1, 'one user added');
+    isTrue(lastMassage.newUsers.first == 'B', 'The user is B');
+
+    chat.unsubscribe();
+
+    // // ? Strange action: It produce permission-error here if it does not read
+    // // ? updated room. The security rule is very clean.
+    await chat.getGlobalRoom(chat.id);
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+    await chat.enter(id: chat.id);
+    await chat.addUser({c: 'C', d: 'D'});
+
+    final lastMassageB = await chat.userRoom;
+    isTrue(lastMassageB.text == ChatProtocol.add, 'C & D added');
+    isTrue(lastMassageB.newUsers.length == 2, 'One user added');
+    isTrue(lastMassageB.newUsers.contains('C'), 'The user C is included');
+    isTrue(lastMassageB.newUsers.contains('D'), 'The user D is included');
+
+    final room = await chat.getGlobalRoom(chat.id);
+    isTrue(room.users.length == 4, 'Four users are in the room');
+    isTrue(room.users.contains(a), 'A is included');
+    isTrue(room.users.contains(b), 'B is included');
+    isTrue(room.users.contains(c), 'C is included');
+    isTrue(room.users.contains(d), 'D is included');
+
+    chat.leave();
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+
+    await chat.enter(id: chat.id);
+    final cRoom = await chat.getGlobalRoom(chat.id);
+
+    isTrue(cRoom.users.length == 3, 'Four users are in the room');
+    isTrue(cRoom.users.contains(a), 'A is included');
+    isTrue(cRoom.users.contains(b) == false, 'B is NOT included');
+    isTrue(cRoom.users.contains(c), 'C is included');
+    isTrue(cRoom.users.contains(d), 'D is included');
+  }
+
+  addModeratorTest() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    await chat.enter(users: [b, c]);
+    await chat.addModerator(b);
+    var room = await chat.getGlobalRoom(chat.id);
+    print(room);
+    isTrue(room.moderators.length == 2, '2 moderators are in the room');
+    isTrue(room.moderators.contains(a), 'A is included as moderator');
+    isTrue(room.moderators.contains(b), 'B is included as moderator');
+
+    try {
+      await chat.addModerator(d);
+      failure('await chat.addModerator(c);');
+    } catch (e) {
+      isTrue(e == MODERATOR_NOT_EXISTS_IN_USERS, 'moderator must exists in users');
+    }
+
+    chat.unsubscribe();
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+
+    await chat.enter(id: chat.id);
+    await chat.addUser({d: 'User D'});
+
+    try {
+      await chat.addModerator(d);
+      failure('You are not moderator');
+    } catch (e) {
+      isTrue(e == YOU_ARE_NOT_MODERATOR, 'Only moderator can add another moderator');
+    }
+
+    // room = await chat.getGlobalRoom(chat.id);
+    // print(room);
+  }
+
+  removeModeratorTest() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    await chat.enter(users: [b, c]);
+    await chat.addModerator(b);
+    var room = await chat.getGlobalRoom(chat.id);
+    isTrue(room.moderators.length == 2, '2 moderators are in the room');
+    isTrue(room.moderators.contains(a), 'A is included as moderator');
+    isTrue(room.moderators.contains(b), 'B is included as moderator');
+
+    await chat.removeModerator(b);
+    room = await chat.getGlobalRoom(chat.id);
+    isTrue(room.moderators.length == 1, '2 moderators are in the room');
+    isTrue(room.moderators.contains(a), 'A is included as moderator');
+    isTrue(room.moderators.contains(b) == false, 'B is NOT included as moderator');
+  }
+
+  blockTest() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    await chat.enter(users: [b, c]);
+    await chat.blockUser(b, 'Name of B');
+    var room = await chat.getGlobalRoom(chat.id);
+    isTrue(room.users.length == 2, '2 user is in the room');
+    isTrue(room.blockedUsers.length == 1, '1 user is in block list');
+    isTrue(room.blockedUsers.first == b, 'b is blocked');
+
+    try {
+      await chat.addUser({b: 'Name of B'});
+      failure("await chat.addUser({b: 'Name of B'});");
+    } catch (e) {
+      isTrue(e == ONE_OF_USERS_ARE_BLOCKED, 'One of users are in block list');
+    }
+  }
+
+  kickoutTest() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    await chat.enter(users: [b, c]);
+
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+    await chat.enter(id: chat.id);
+
+    try {
+      await chat.kickout(c, 'Name of C');
+      failure("await bChat.kickout(c, 'Name of C');");
+    } catch (e) {
+      isTrue(e == YOU_ARE_NOT_MODERATOR, 'Only moderator can kick a user out');
+    }
+
+    chat.unsubscribe();
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    try {
+      await chat.enter(id: chat.id);
+      await chat.kickout(c, 'Name of C');
+      isTrue(true, "await Chat.kickout(c, 'Name of C'); must be success");
+    } catch (e) {
+      failure('must success, A is a moderator');
+    }
+
+    var room = await chat.getGlobalRoom(chat.id);
+    isTrue(room.users.length == 2, '2 user is in the room');
+
+    isTrue(room.users.contains(a), 'A is included');
+    isTrue(room.users.contains(b), 'B is included');
+    isTrue(room.users.contains(c) == false, 'C is NOT included');
   }
 
   success(String message) {

@@ -147,7 +147,7 @@ class ChatRoom extends ChatBase {
           }
         } catch (e) {
           // If room does not exist(or it cannot read), then create.
-          // getGlobalRoom will throw error if room doesnt exist yet.
+          // getGlobalRoom(id) will throw error if room doesnt exist yet.
           if (e.code == 'permission-denied') {
             // continue to create room
             // print("============== permission-denied ========================");

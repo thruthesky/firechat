@@ -316,6 +316,57 @@ class FireChatTest {
     }
   }
 
+  leaveTest() async {
+    // login user a
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+    final chat = ChatRoom.instance;
+    // create/enter abc room
+    try {
+      await chat.enter(users: [b, c]);
+      ChatUserRoom room = await chat.userRoom;
+      isTrue(room.text == ChatProtocol.roomCreated, 'abc roomCreated');
+      await chat.unsubscribe();
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+
+    try {
+      await chat.enter(id: chat.id);
+      await chat.unsubscribe();
+      await chat.leave();
+      isTrue(chat.users.length == 2, 'Expected: ' + "${chat.users.length} == 2");
+      isTrue(chat.users.contains(a), 'Expected: ' + "$a exist on user list");
+      isTrue(chat.users.contains(b) == false, 'Expected: ' + "$b doesnt on user list");
+      isTrue(chat.users.contains(c), 'Expected: ' + "$c doesnt exist on user list");
+    } catch (e) {
+      failure('Must be success of create abc room: ');
+      print(e);
+    }
+
+    // await _ff.loginOrRegister(email: aEmail, password: password);
+    // final chatA = ChatRoom(inject: _ff);
+    // await chatA.enter(id: chat.id);
+    // final lastMessageA = await chatA.lastMessage;
+    // isTrue(lastMessageA.text == ChatProtocol.leave, 'leave checked by a');
+
+    // await _ff.loginOrRegister(email: cEmail, password: password);
+    // final chatC = ChatRoom(inject: _ff);
+    // await chatC.enter(id: chat.id);
+    // final lastMessageC = await chatC.lastMessage;
+    // isTrue(lastMessageC.text == ChatProtocol.leave, 'leave checked by c');
+
+    // await _ff.loginOrRegister(email: bEmail, password: password);
+    // try {
+    //   await chatB.lastMessage;
+    //   isTrue(false, 'room must not exist after leave');
+    // } catch (e) {
+    //   isTrue(e == ROOM_NOT_EXISTS, 'room not exist after leave');
+    // }
+  }
+
   success(String message) {
     print("[S] $message");
   }

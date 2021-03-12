@@ -29,20 +29,20 @@ class FireChatTest {
   final String textABC = 'ABC ROOM MESSAGE';
 
   runAllTests() async {
-    // await inputTest();
-    // await chatWithMyself();
-    // await chatMyselfWithHatch();
+    await inputTest();
+    await chatWithMyself();
+    await chatMyselfWithHatch();
     // await roomCreateTestA();
-    await roomCreateTestB();
-    // await roomCreateTestHatchFalse();
-    // await sendMessageTestA();
-    // await sendMessageTestB();
-    // await leaveTest();
-    // await userInvitationTest();
-    // await addModeratorTest();
-    // await removeModeratorTest();
-    // await blockTest();
-    // await kickoutTest();
+    // await roomCreateTestB();
+    await roomCreateTestHatchFalse();
+    await sendMessageTestA();
+    await sendMessageTestB();
+    await leaveTest();
+    await userInvitationTest();
+    await addModeratorTest();
+    await removeModeratorTest();
+    await blockTest();
+    await kickoutTest();
     print('TEST ERROR:::::: [ $_countError ]');
   }
 

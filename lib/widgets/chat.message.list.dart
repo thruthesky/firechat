@@ -1,3 +1,4 @@
+import 'package:firechat/firechat.dart';
 import 'package:firechat/widgets/chat.message.bottom_actions.dart';
 import 'package:firechat/widgets/chat.message.view.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,8 +23,6 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
   var _tapPosition;
 
   bool loading = false;
-  final scrollController = ScrollController();
-  List<dynamic> messages = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +34,10 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
                 child: KeyboardDismissOnTap(
                   child: ListView.builder(
                     padding: EdgeInsets.all(0),
-                    controller: scrollController,
-                    itemCount: messages.length,
+                    controller: ChatRoom.instance.scrollController,
+                    itemCount: ChatRoom.instance.messages.length,
                     itemBuilder: (_, i) {
-                      final message = messages[i];
+                      final message = ChatMessage.fromData(ChatRoom.instance.messages[i]);
                       return message.isMine ? myMessage(message) : otherMessage(message);
                     },
                   ),

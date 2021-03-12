@@ -5,6 +5,19 @@ part of './firechat.dart';
 /// This is a completely independent helper class to help to list login user's room list.
 /// You may rewrite your own helper class.
 class ChatUserRoomList extends ChatBase {
+  /// Api Singleton
+  static ChatUserRoomList _instance;
+  static ChatUserRoomList get instance {
+    if (_instance == null) {
+      _instance = ChatUserRoomList._internal();
+    }
+    return _instance;
+  }
+
+  ChatUserRoomList._internal() {
+    print('=> ChatUserRoomList._internal(). This must be called only once.');
+  }
+
   Function __render;
 
   StreamSubscription _myRoomListSubscription;

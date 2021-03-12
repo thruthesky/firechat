@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -79,8 +79,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
                       })
                   : SizedBox(),
               Text(
-                widget.message.createdAt,
-                // dateTimeFromTimeStamp(widget.message.createdAt),
+                shortDateTime(widget.message.createdAt),
                 style: TextStyle(fontSize: 8),
                 // textAlign: widget.message.isMine ? TextAlign.right : TextAlign.left,
               ),
@@ -89,6 +88,20 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
         )
       ],
     );
+  }
+
+  String shortDateTime(dynamic dt) {
+    /// If it's firestore `FieldValue.serverTimstamp()`, the event may be fired
+    /// twice.
+    if (dt == null) {
+      return '';
+    }
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(dt.seconds * 1000);
+    DateTime today = DateTime.now();
+    if (time.year == today.year && time.month == today.month && time.day == today.day) {
+      return DateFormat.jm().format(time);
+    }
+    return DateFormat('dd/MM/yy').format(time);
   }
 }
 

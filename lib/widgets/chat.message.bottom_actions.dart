@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firechat/firechat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,11 +31,10 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
 
     try {
       if (isMessageEdit == null) {
-        // await Api.instance.chat.sendMessage(
-        //   text: text,
-        // );
+        await ChatRoom.instance
+            .sendMessage(text: text, displayName: FirebaseAuth.instance.currentUser.uid);
 
-        // /// Send Push Notification Silently
+        /// Send Push Notification Silently
         // Api.instance.chat.sendChatPushMessage(text).catchError((e) {
         //   if (e == ERROR_EMPTY_TOKENS) {
         //     // print('No tokens to sends. It is not a critical error');
@@ -42,16 +43,16 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
         //   }
         // });
       } else {
-        // await Api.instance.chat.sendMessage(
-        //   text: text,
-        // );
+        await ChatRoom.instance
+            .sendMessage(text: text, displayName: FirebaseAuth.instance.currentUser.uid);
       }
       sending = false;
     } catch (e) {
       sending = false;
       onError(e);
     }
-    // Api.instance.chat.notify();
+    setState(() {});
+    // Api.instance.chat.notify();  // Notify changes
   }
 
   onError(dynamic e) {

@@ -81,6 +81,8 @@ class ChatRoom extends ChatBase {
   /// push notification topic name
   String get topic => 'notifyChat-${this.id}';
 
+  final scrollController = ScrollController();
+
   /// Enter chat room
   ///
   /// If [hatch] is set to true, then it will always create new room even if you are talking to
@@ -91,7 +93,9 @@ class ChatRoom extends ChatBase {
   /// Null or empty string in [users] will be wiped out.
   ///
   /// Whenever global room information changes, it is updated on [global].
-  Future<void> enter({String id, List<String> users, bool hatch = true}) async {
+  Future<void> enter({String id, List<String> users, bool hatch = true, Function render}) async {
+    _render = render;
+
     /// confusing with [this.id], so, it goes as `_id`.
     String _id = id;
 

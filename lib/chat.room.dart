@@ -321,6 +321,7 @@ class ChatRoom extends ChatBase {
           assert(false, 'This is error');
         }
       });
+
       _notify();
     });
   }

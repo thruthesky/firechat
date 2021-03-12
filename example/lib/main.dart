@@ -60,11 +60,27 @@ class _MyHomePageState extends State<MyHomePage> {
       // FireChatTest().removeModeratorTest();
       // FireChatTest().blockTest();
       // FireChatTest().kickoutTest();
+
+      // () async {
+      //   try {
+      //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
+      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'A');
+      //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
+      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'B');
+      //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
+      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'C');
+      //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: dEmail, password: password);
+      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'D');
+      //   } catch (e) {
+      //     print(e);
+      //   }
+      // }();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -74,8 +90,24 @@ class _MyHomePageState extends State<MyHomePage> {
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'User Signin ' +
-                  "${FirebaseAuth.instance.currentUser == null ? '' : FirebaseAuth.instance.currentUser.uid}",
+              'Firechat Functionality\n'
+              '- [Done] 1:1 chat with same room\n'
+              '- 1:1 chat with new room\n'
+              '- Multi user chat with same room\n'
+              '- Multi user chat with new room\n'
+              '- Room information (like title) change.\n'
+              '- User invitation\n'
+              '- Kicking out a user\n'
+              '- [Done] Block a user\n'
+              '- Set a user as admin\n'
+              '- When admin leave the room, one of other user automatically becomes admin\n'
+              '- [Done] Listening changes of room list and showing new messages.'
+              '- Room password lock\n',
+            ),
+            Text(
+              'User Signed in as '
+              '${user?.displayName}'
+              "-${user?.uid}",
             ),
             TextButton(
               onPressed: () async {
@@ -83,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     .signInWithEmailAndPassword(email: aEmail, password: password);
                 setState(() {});
               },
-              child: Text('Login UserA'),
+              child: Text('Login as UserA'),
             ),
             TextButton(
               onPressed: () async {
@@ -91,7 +123,23 @@ class _MyHomePageState extends State<MyHomePage> {
                     .signInWithEmailAndPassword(email: bEmail, password: password);
                 setState(() {});
               },
-              child: Text('Login UserB'),
+              child: Text('Login as UserB'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(email: cEmail, password: password);
+                setState(() {});
+              },
+              child: Text('Login as UserC'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(email: dEmail, password: password);
+                setState(() {});
+              },
+              child: Text('Login as UserD'),
             ),
             TextButton(
               onPressed: () async {

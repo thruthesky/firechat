@@ -28,6 +28,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   void initState() {
     super.initState();
     enterChatRoom();
+
+    // chat.changes.listen(() {
+    //   if(mounted) setState(() {
+
+    //         });
+    // });
   }
 
   enterChatRoom() async {

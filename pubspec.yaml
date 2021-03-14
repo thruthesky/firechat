@@ -1,6 +1,6 @@
 name: firechat
-description: A new Flutter package project.
-version: 0.0.1
+description: Chat package that has complete chatting functionality using Firebase.
+version: 0.0.2
 homepage: https://github.com/thruthesky/firechat
 
 environment:

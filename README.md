@@ -110,3 +110,13 @@ a.firebaseInitialized.listen((ready) { // when firebase initialized,
   FireChatTest().roomCreateTest(); // call test.
 });
 ```
+Known Issues
+
+git error
+```error
+fatal: filename in tree entry contains backslash: 'build\ios'
+```
+solution
+```
+git config --global core.protectNTFS false
+```

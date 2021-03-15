@@ -3,7 +3,7 @@ import 'package:example/screens/chat.room.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firechat/chat.test.dart';
+// import 'package:firechat/chat.test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -3,7 +3,7 @@ import 'package:example/screens/chat.room.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firechat/chat.test.dart';
+// import 'package:firechat/chat.test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,100 +85,102 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Firechat Functionality\n'
-              '- [Done] 1:1 chat with same room\n'
-              '- 1:1 chat with new room\n'
-              '- Multi user chat with same room\n'
-              '- Multi user chat with new room\n'
-              '- Room information (like title) change.\n'
-              '- User invitation\n'
-              '- Kicking out a user\n'
-              '- [Done] Block a user\n'
-              '- Set a user as admin\n'
-              '- When admin leave the room, one of other user automatically becomes admin\n'
-              '- [Done] Listening changes of room list and showing new messages.'
-              '- Room password lock\n',
-            ),
-            Text(
-              'User Signed in as '
-              '${user?.displayName}'
-              "-${user?.uid}",
-            ),
-            TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: aEmail, password: password);
-                setState(() {});
-              },
-              child: Text('Login as UserA'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: bEmail, password: password);
-                setState(() {});
-              },
-              child: Text('Login as UserB'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: cEmail, password: password);
-                setState(() {});
-              },
-              child: Text('Login as UserC'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: dEmail, password: password);
-                setState(() {});
-              },
-              child: Text('Login as UserD'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatRoomScreen(uid: a, displayName: 'User A'),
-                    ));
-              },
-              child: Text('Chat User A'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatRoomScreen(uid: b, displayName: 'User B'),
-                    ));
-              },
-              child: Text('Chat User B'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatRoomListScreen(),
-                    ));
-              },
-              child: Text('My Room list'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                setState(() {});
-              },
-              child: Text('Log Out'),
-            )
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Firechat Functionality\n'
+                '- [Done] 1:1 chat with same room\n'
+                '- 1:1 chat with new room\n'
+                '- Multi user chat with same room\n'
+                '- Multi user chat with new room\n'
+                '- Room information (like title) change.\n'
+                '- User invitation\n'
+                '- Kicking out a user\n'
+                '- [Done] Block a user\n'
+                '- Set a user as admin\n'
+                '- When admin leave the room, one of other user automatically becomes admin\n'
+                '- [Done] Listening changes of room list and showing new messages.'
+                '- Room password lock\n',
+              ),
+              Text(
+                'User Signed in as '
+                '${user?.displayName}'
+                "-${user?.uid}",
+              ),
+              TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(email: aEmail, password: password);
+                  setState(() {});
+                },
+                child: Text('Login as UserA'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(email: bEmail, password: password);
+                  setState(() {});
+                },
+                child: Text('Login as UserB'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(email: cEmail, password: password);
+                  setState(() {});
+                },
+                child: Text('Login as UserC'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(email: dEmail, password: password);
+                  setState(() {});
+                },
+                child: Text('Login as UserD'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatRoomScreen(uid: a, displayName: 'User A'),
+                      ));
+                },
+                child: Text('Chat User A'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatRoomScreen(uid: b, displayName: 'User B'),
+                      ));
+                },
+                child: Text('Chat User B'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatRoomListScreen(),
+                      ));
+                },
+                child: Text('My Room list'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  setState(() {});
+                },
+                child: Text('Log Out'),
+              )
+            ],
+          ),
         ),
       ),
     );

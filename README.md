@@ -1,6 +1,20 @@
 # Firechat
 
-Firebase chat package for Flutter
+This is a complete Firebase chat package that has the following functions;
+
+- 1:1 chat with same room
+- 1:1 chat with new room
+- Multi user chat with same room
+- Multi user chat with new room
+- Room information (like title) change.
+- User invitation
+- Kicking out a user
+- Block a user
+- Set a user as admin
+- When admin leave the room, one of other user automatically becomes admin
+- Listening changes of room list and showing new messages.
+- Room password lock
+
 
 # Reference
 

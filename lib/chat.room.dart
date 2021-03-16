@@ -27,11 +27,8 @@ class ChatRoom extends ChatBase {
   /// [globalRoomChange] will be invoked when global chat room changes.
   ChatRoom({
     Function render,
-    Function globalRoomChange,
-  })  : _render = render,
-        _globalRoomChange = globalRoomChange {
-    _notifySubjectSubscription =
-        _notifySubject.debounceTime(Duration(milliseconds: 50)).listen((x) {
+  }) {
+    _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
       /// Scroll down for new message(s)
       ///
       /// For image, it will be scrolled down again(one more time) after image had completely loaded.
@@ -42,7 +39,7 @@ class ChatRoom extends ChatBase {
           scrollToBottom();
         }
       }
-      _render();
+      changes.add(null);
     });
   }
 
@@ -59,15 +56,22 @@ class ChatRoom extends ChatBase {
   bool _throttling = false;
 
   ///
-  Function _render;
-  Function _globalRoomChange;
+  // Function _render;
+  // Function _globalRoomChange;
+
+  /// When the room information changes or there is new message, then [changes] will be posted.
+  BehaviorSubject changes = BehaviorSubject.seeded(null);
+  // BehaviorSubject<ChatMessage> messages = BehaviorSubject.seeded(null);
+
+  /// Whenever global room information chagnes, [globalRoomChanges] will be posted.
+  BehaviorSubject<ChatGlobalRoom> globalRoomChanges = BehaviorSubject.seeded(null);
 
   StreamSubscription _chatRoomSubscription;
   StreamSubscription _currentRoomSubscription;
   StreamSubscription _globalRoomSubscription;
 
-  PublishSubject _notifySubject = PublishSubject();
-  StreamSubscription _notifySubjectSubscription;
+  PublishSubject _delay = PublishSubject();
+  StreamSubscription _delaySubscription;
 
   /// Loaded the chat messages of current chat room.
   List<Map<String, dynamic>> messages = [];
@@ -129,9 +133,7 @@ class ChatRoom extends ChatBase {
   /// Null or empty string in [users] will be wiped out.
   ///
   /// Whenever global room information changes, it is updated on [global].
-  Future<void> enter({String id, List<String> users, bool hatch = true, Function render}) async {
-    _render = render;
-
+  Future<void> enter({String id, List<String> users, bool hatch = true}) async {
     /// confusing with [this.id], so, it goes as `_id`.
     String _id = id;
 
@@ -211,9 +213,7 @@ class ChatRoom extends ChatBase {
       global = ChatGlobalRoom.fromSnapshot(event);
       // print(' ------------> global updated; ');
       // print(global);
-      if (_globalRoomChange != null) {
-        _globalRoomChange();
-      }
+      globalRoomChanges.add(global);
     });
 
     // Listening current room document change event (in my room list).
@@ -279,10 +279,12 @@ class ChatRoom extends ChatBase {
 
   /// Notify chat room listener to re-render the screen.
   _notify() {
-    if (_render != null) {
-      _notifySubject.add(null);
-    }
+    // if (_render != null) {
+    _delay.add(null);
+    // }
     // if (_render != null) _render();
+
+    changes.add(null);
   }
 
   /// Fetch previous messages
@@ -406,9 +408,9 @@ class ChatRoom extends ChatBase {
       _globalRoomSubscription = null;
     }
 
-    if (_notifySubjectSubscription != null) {
-      _notifySubjectSubscription.cancel();
-      _notifySubjectSubscription = null;
+    if (_delaySubscription != null) {
+      _delaySubscription.cancel();
+      _delaySubscription = null;
     }
     if (keyboardSubscription != null) {
       keyboardSubscription.cancel();

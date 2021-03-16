@@ -16,9 +16,12 @@ class ChatUserRoomList extends ChatBase {
 
   ChatUserRoomList._internal() {
     print('=> ChatUserRoomList._internal(). This must be called only once.');
+    listenRoomList();
   }
 
-  Function __render;
+  // Function __render;
+
+  BehaviorSubject changes = BehaviorSubject.seeded(null);
 
   StreamSubscription _myRoomListSubscription;
   List<StreamSubscription> _roomSubscriptions = [];
@@ -29,23 +32,22 @@ class ChatUserRoomList extends ChatBase {
   /// ```dart
   /// myRoomList?.fetched != true ? Spinner() : ListView.builder( ... );
   /// ```
-  bool fetched = false;
+  // bool fetched = false;
 
   /// My room list including room id.
   List<ChatUserRoom> rooms = [];
-  String _order = "";
-  ChatUserRoomList({
-    @required Function render,
-    @required String loginUserId,
-    String order = "createdAt",
-  })  : __render = render,
-        _order = order {
-    listenRoomList();
-  }
+  String _order = "createdAt";
+  // ChatUserRoomList({
+  //   @required Function render,
+  //   String order = "createdAt",
+  // })  : __render = render,
+  //       _order = order {
+  //   listenRoomList();
+  // }
 
-  _notify() {
-    if (__render != null) __render();
-  }
+  // _notify() {
+  //   if (__render != null) __render();
+  // }
 
   reset({String order}) {
     if (order != null) {
@@ -66,22 +68,23 @@ class ChatUserRoomList extends ChatBase {
   listenRoomList() {
     _myRoomListSubscription =
         myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
-      fetched = true;
-      _notify();
+      // fetched = true;
+      changes.add(null);
       snapshot.docChanges.forEach((DocumentChange documentChange) {
         final roomInfo = ChatUserRoom.fromSnapshot(documentChange.doc);
 
         if (documentChange.type == DocumentChangeType.added) {
           rooms.add(roomInfo);
 
-          /// Listen and merge global room settings into private room info.
+          /// When room list is retreived for the first, it will be added to listener.
+          /// This is whey [changes] event happens many times when the app listens to room list.
           _roomSubscriptions.add(
             globalRoomDoc(roomInfo.id).snapshots().listen(
               (DocumentSnapshot snapshot) {
                 int found = rooms.indexWhere((r) => r.id == roomInfo.id);
                 rooms[found].global = ChatGlobalRoom.fromSnapshot(snapshot);
                 // snapshot.data();
-                _notify();
+                changes.add(null);
               },
             ),
           );
@@ -101,7 +104,7 @@ class ChatUserRoomList extends ChatBase {
           assert(false, 'This is error');
         }
       });
-      _notify();
+      changes.add(null);
     });
   }
 

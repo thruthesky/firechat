@@ -1,3 +1,4 @@
+import 'package:firechat/firechat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ class ChatRoomViewWidget extends StatefulWidget {
     this.onTap,
   });
 
-  final dynamic room;
+  final ChatUserRoom room;
   final Function onTap;
 
   @override
@@ -21,26 +22,26 @@ class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
       // leading: UserAvatar(
       //   widget.room.profilePhotoUrl ?? '',
       // ),
-      title: Text(widget.room['displayName'] ?? ''),
+      title: Text(widget.room.senderDisplayName),
       subtitle: Text(
-        widget.room['text'] ?? '',
+        widget.room.text,
         overflow: TextOverflow.ellipsis,
       ),
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "${widget.room['createdAt']}",
+            "${widget.room.createdAt}",
             // style: subtitle1,
           ),
           Spacer(),
-          if (widget.room['newMessages'] > 0)
+          if (widget.room.newMessages > 0)
             ConstrainedBox(
               constraints: BoxConstraints(maxHeight: 24),
               child: Chip(
                 labelPadding: EdgeInsets.fromLTRB(4, -4, 4, -4),
                 label: Text(
-                  '${widget.room['newMessages']}',
+                  '${widget.room.newMessages}',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.white,

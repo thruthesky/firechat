@@ -28,23 +28,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   void initState() {
     super.initState();
     enterChatRoom();
-
-    // chat.changes.listen(() {
-    //   if(mounted) setState(() {
-
-    //         });
-    // });
+    ChatRoom.instance.changes.listen((value) {
+      if (mounted) setState(() {});
+    });
   }
 
   enterChatRoom() async {
-    await chat.enter(
-      users: [widget.uid],
-      hatch: false,
-      render: () {
-        /// Whenever there is an event on chat room, re-render.
-        if (mounted) setState(() {});
-      },
-    );
+    await chat.enter(users: [widget.uid], hatch: false);
     print(chat);
   }
 

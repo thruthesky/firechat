@@ -23,16 +23,14 @@ class _ChatRoomListScreenState extends State<ChatRoomListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Chat Room List')),
-      body: Container(
-        child: ChatRoomListWidget(
-          onChatRoomTap: (room) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Text('Chat Message'),
-                ));
-          },
-        ),
+      body: ChatRoomListWidget(
+        onChatRoomTap: (room) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Text('Chat Message'),
+              ));
+        },
       ),
     );
   }

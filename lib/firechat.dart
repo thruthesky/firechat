@@ -8,6 +8,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'chat.definitions.dart';
 part 'chat.protocol.dart';

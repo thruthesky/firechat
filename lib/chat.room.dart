@@ -29,7 +29,22 @@ class ChatRoom extends ChatBase {
     Function render,
     Function globalRoomChange,
   })  : _render = render,
-        _globalRoomChange = globalRoomChange;
+        _globalRoomChange = globalRoomChange {
+    _notifySubjectSubscription =
+        _notifySubject.debounceTime(Duration(milliseconds: 50)).listen((x) {
+      /// Scroll down for new message(s)
+      ///
+      /// For image, it will be scrolled down again(one more time) after image had completely loaded.
+      if (messages.isNotEmpty) {
+        if (page == 1) {
+          scrollToBottom(ms: 10);
+        } else if (atBottom) {
+          scrollToBottom();
+        }
+      }
+      _render();
+    });
+  }
 
   int _limit = 30;
 
@@ -50,6 +65,9 @@ class ChatRoom extends ChatBase {
   StreamSubscription _chatRoomSubscription;
   StreamSubscription _currentRoomSubscription;
   StreamSubscription _globalRoomSubscription;
+
+  PublishSubject _notifySubject = PublishSubject();
+  StreamSubscription _notifySubjectSubscription;
 
   /// Loaded the chat messages of current chat room.
   List<Map<String, dynamic>> messages = [];
@@ -82,6 +100,24 @@ class ChatRoom extends ChatBase {
   String get topic => 'notifyChat-${this.id}';
 
   final scrollController = ScrollController();
+
+  /// When keyboard(keypad) is open, the app needs to adjust the scroll.
+  final keyboardVisibilityController = KeyboardVisibilityController();
+  StreamSubscription keyboardSubscription;
+
+  /// Scrolls down to the bottom when,
+  /// * chat room is loaded (only one time.)
+  /// * when I chat,
+  /// * when new chat is coming and the page is scrolled near to bottom. Logically it should not scroll down when the page is scrolled far from the bottom.
+  /// * when keyboard is open and the page scroll is near to bottom. Locally it should not scroll down when the user is reading message that is far from the bottom.
+  scrollToBottom({int ms = 100}) {
+    /// This is needed to safely scroll to bottom after chat messages has been added.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients)
+        scrollController.animateTo(scrollController.position.maxScrollExtent,
+            duration: Duration(milliseconds: ms), curve: Curves.ease);
+    });
+  }
 
   /// Enter chat room
   ///
@@ -197,6 +233,20 @@ class ChatRoom extends ChatBase {
         currentRoom.update({'newMessages': 0});
       }
     });
+
+    // fetch previous chat when user scrolls up
+    scrollController.addListener(() {
+      if (scrollUp && atTop) {
+        fetchMessages();
+      }
+    });
+
+    // scroll to bottom only if needed when user open/hide keyboard.
+    keyboardSubscription = keyboardVisibilityController.onChange.listen((bool visible) {
+      if (visible && atBottom) {
+        scrollToBottom(ms: 10);
+      }
+    });
   }
 
   /// Returns the current room in my room list.
@@ -229,7 +279,10 @@ class ChatRoom extends ChatBase {
 
   /// Notify chat room listener to re-render the screen.
   _notify() {
-    if (_render != null) _render();
+    if (_render != null) {
+      _notifySubject.add(null);
+    }
+    // if (_render != null) _render();
   }
 
   /// Fetch previous messages
@@ -351,6 +404,15 @@ class ChatRoom extends ChatBase {
     if (_globalRoomSubscription != null) {
       _globalRoomSubscription.cancel();
       _globalRoomSubscription = null;
+    }
+
+    if (_notifySubjectSubscription != null) {
+      _notifySubjectSubscription.cancel();
+      _notifySubjectSubscription = null;
+    }
+    if (keyboardSubscription != null) {
+      keyboardSubscription.cancel();
+      keyboardSubscription = null;
     }
   }
 
@@ -606,4 +668,20 @@ class ChatRoom extends ChatBase {
   /// Note that `getMyRoomInfo()` returns `ChatRoomInfo` while `myRoom()`
   /// returns document reference.
   Future<ChatUserRoom> get userRoom => getMyRoomInfo(loginUserUid, id);
+
+  bool get atBottom {
+    return scrollController.offset > (scrollController.position.maxScrollExtent - 640);
+  }
+
+  bool get atTop {
+    return scrollController.position.pixels < 200;
+  }
+
+  bool get scrollUp {
+    return scrollController.position.userScrollDirection == ScrollDirection.forward;
+  }
+
+  bool get scrollDown {
+    return scrollController.position.userScrollDirection == ScrollDirection.reverse;
+  }
 }

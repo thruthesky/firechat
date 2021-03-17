@@ -33,7 +33,7 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
               Expanded(
                 child: KeyboardDismissOnTap(
                   child: ListView.builder(
-                    padding: EdgeInsets.all(0),
+                    padding: EdgeInsets.symmetric(vertical: 8),
                     controller: ChatRoom.instance.scrollController,
                     itemCount: ChatRoom.instance.messages.length,
                     itemBuilder: (_, i) {

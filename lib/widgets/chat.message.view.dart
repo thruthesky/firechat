@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firechat/firechat.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,7 +15,7 @@ class ChatMessageViewWidget extends StatefulWidget {
     Key key,
   }) : super(key: key);
 
-  final dynamic message;
+  final ChatMessage message;
   final Function onImageRenderCompelete;
 
   @override
@@ -29,12 +30,20 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (!widget.message.isMine)
+          Container(
+            padding: EdgeInsets.only(left: 8),
+            child: Text(
+              widget.message.senderDisplayName,
+              textAlign: widget.message.isMine ? TextAlign.right : TextAlign.left,
+              style: TextStyle(fontSize: 10),
+            ),
+          ),
         ChatBubble(
           clipper: widget.message.isMine
               ? ChatBubbleClipper4(type: BubbleType.sendBubble)
               : ChatBubbleClipper4(type: BubbleType.receiverBubble),
           alignment: widget.message.isMine ? Alignment.topRight : Alignment.topLeft,
-          margin: EdgeInsets.only(top: 20),
           backGroundColor: Colors.blue,
           child: Container(
             constraints: BoxConstraints(
@@ -51,7 +60,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
                     },
                   )
                 : Text(
-                    widget.message.text ?? widget.message.protocol,
+                    widget.message.text,
                     textAlign: widget.message.isMine ? TextAlign.right : TextAlign.left,
                     style: TextStyle(color: Colors.white),
                   ),

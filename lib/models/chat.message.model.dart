@@ -37,10 +37,10 @@ class ChatMessage {
     return ChatMessage(
       createdAt: data['createdAt'],
       newUsers: data['newUsers'],
-      senderDisplayName: data['senderDisplayName'],
-      senderPhotoURL: data['senderPhotoURL'],
-      senderUid: data['senderUid'],
-      text: data['text'],
+      senderDisplayName: data['senderDisplayName'] ?? '',
+      senderPhotoURL: data['senderPhotoURL'] ?? '',
+      senderUid: data['senderUid'] ?? '',
+      text: data['text'] ?? '',
       isMine: data['senderUid'] == ChatRoom.instance.loginUserUid,
       isImage: isImage,
     );

@@ -13,6 +13,8 @@ dependencies:
 
   cupertino_icons: ^1.0.0
 
+  badges: ^1.1.6
+
   firechat:
     path: ..
 

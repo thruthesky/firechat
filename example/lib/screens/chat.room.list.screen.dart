@@ -1,3 +1,5 @@
+import 'package:example/screens/chat.room.screen.dart';
+import 'package:firechat/firechat.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firechat/widgets/chat.room.list.dart';
@@ -16,7 +18,6 @@ class _ChatRoomListScreenState extends State<ChatRoomListScreen> {
   @override
   void dispose() {
     super.dispose();
-    // subscription.cancel();
   }
 
   @override
@@ -24,11 +25,14 @@ class _ChatRoomListScreenState extends State<ChatRoomListScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Chat Room List')),
       body: ChatRoomListWidget(
-        onChatRoomTap: (room) {
+        onChatRoomTap: (ChatUserRoom room) {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => Text('Chat Message'),
+                builder: (context) => ChatRoomScreen(
+                  id: room.id,
+                  senderDisplayName: room.senderDisplayName,
+                ),
               ));
         },
       ),

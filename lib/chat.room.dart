@@ -18,30 +18,16 @@ class ChatRoom extends ChatBase {
     print('=> ChatRoom._internal(). This must be called only once.');
   }
 
-  /// [render] will be called to notify chat room listener to re-render the screen.
-  ///
-  /// For one chat message sending,
-  /// - [render] will be invoked 2 times on message sender's device due to offline support.
-  /// - [render] will be invoked 1 times on receiver's device.
-  ///
-  /// [globalRoomChange] will be invoked when global chat room changes.
-  ChatRoom({
-    Function render,
-  }) {
-    _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
-      /// Scroll down for new message(s)
-      ///
-      /// For image, it will be scrolled down again(one more time) after image had completely loaded.
-      if (messages.isNotEmpty) {
-        if (page == 1) {
-          scrollToBottom(ms: 10);
-        } else if (atBottom) {
-          scrollToBottom();
-        }
-      }
-      changes.add(null);
-    });
-  }
+  // /// [render] will be called to notify chat room listener to re-render the screen.
+  // ///
+  // /// For one chat message sending,
+  // /// - [render] will be invoked 2 times on message sender's device due to offline support.
+  // /// - [render] will be invoked 1 times on receiver's device.
+  // ///
+  // /// [globalRoomChange] will be invoked when global chat room changes.
+  // ChatRoom({
+  //   Function render,
+  // }) {}
 
   int _limit = 30;
 
@@ -201,14 +187,26 @@ class ChatRoom extends ChatBase {
       }
     }
 
+    _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
+      /// Scroll down for new message(s)
+      ///
+      /// For image, it will be scrolled down again(one more time) after image had completely loaded.
+      if (messages.isNotEmpty) {
+        if (page == 1) {
+          scrollToBottom(ms: 10);
+        } else if (atBottom) {
+          scrollToBottom();
+        }
+      }
+      changes.add(null);
+    });
+
     // fetch latest messages
     fetchMessages();
 
     // Listening current global room for changes and update.
     if (_globalRoomSubscription != null) _globalRoomSubscription.cancel();
 
-    // _globalRoomSubscription = globalRoomDoc(_id).snapshots().listen((event) {
-    // print('------------> subscribe global update: ${global.roomId}');
     _globalRoomSubscription = globalRoomDoc(global.roomId).snapshots().listen((event) {
       global = ChatGlobalRoom.fromSnapshot(event);
       // print(' ------------> global updated; ');
@@ -319,10 +317,6 @@ class ChatRoom extends ChatBase {
 
       loading = false;
       Timer(Duration(milliseconds: _throttle), () => _throttling = false);
-      // Timer(Duration(milliseconds: _loadingTimeout), () {
-      //   loading = false;
-      //   _notify();
-      // });
 
       snapshot.docChanges.forEach((DocumentChange documentChange) {
         final message = documentChange.doc.data();
@@ -416,6 +410,13 @@ class ChatRoom extends ChatBase {
       keyboardSubscription.cancel();
       keyboardSubscription = null;
     }
+    resetRoom();
+  }
+
+  resetRoom() {
+    messages = [];
+    page = 0;
+    noMoreMessage = false;
   }
 
   /// Send chat message to the users in the room

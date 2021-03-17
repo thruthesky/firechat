@@ -1,6 +1,7 @@
 import 'package:firechat/firechat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatRoomViewWidget extends StatefulWidget {
   ChatRoomViewWidget(
@@ -22,7 +23,10 @@ class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
       // leading: UserAvatar(
       //   widget.room.profilePhotoUrl ?? '',
       // ),
-      title: Text(widget.room.senderDisplayName),
+      title: Text(
+        widget.room.id,
+        overflow: TextOverflow.ellipsis,
+      ),
       subtitle: Text(
         widget.room.text,
         overflow: TextOverflow.ellipsis,
@@ -31,7 +35,7 @@ class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "${widget.room.createdAt}",
+            "${shortDateTime(widget.room.createdAt)}",
             // style: subtitle1,
           ),
           Spacer(),
@@ -57,5 +61,19 @@ class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
         if (widget.onTap != null) widget.onTap();
       },
     );
+  }
+
+  String shortDateTime(dynamic dt) {
+    /// If it's firestore `FieldValue.serverTimstamp()`, the event may be fired
+    /// twice.
+    if (dt == null) {
+      return '';
+    }
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(dt.seconds * 1000);
+    DateTime today = DateTime.now();
+    if (time.year == today.year && time.month == today.month && time.day == today.day) {
+      return DateFormat.jm().format(time);
+    }
+    return DateFormat('dd/MM/yy').format(time);
   }
 }

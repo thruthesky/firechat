@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firechat/firechat.dart';
 import 'package:firechat/widgets/chat.room.view.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,43 +16,25 @@ class ChatRoomListWidget extends StatefulWidget {
 }
 
 class _ChatRoomListWidgetState extends State<ChatRoomListWidget> {
-  // bool fetched = true;
-  // List<dynamic> roomList = [
-  //   {
-  //     'displayName': 'userA',
-  //     'profilePhotoUrl': '',
-  //     'newMessages': 0,
-  //     'text': 'hello',
-  //     'createdAt': 1,
-  //     'userIdx': 2
-  //   },
-  //   {
-  //     'displayName': 'userB',
-  //     'profilePhotoUrl': '',
-  //     'newMessages': 0,
-  //     'text': 'hi',
-  //     'createdAt': 2,
-  //     'userIdx': 3
-  //   },
-  //   {
-  //     'displayName': 'userC',
-  //     'profilePhotoUrl': '',
-  //     'newMessages': 0,
-  //     'text': 'hiyyyy',
-  //     'createdAt': 3,
-  //     'userIdx': 4
-  //   },
-  // ];
+  StreamSubscription chatUserRoomListSubscription;
 
   @override
   void initState() {
     super.initState();
 
     /// When any of the login user's rooms changes, it will be handled here.
-    ChatUserRoomList.instance.changes.listen((rooms) {
+    chatUserRoomListSubscription = ChatUserRoomList.instance.changes.listen((rooms) {
       print('ChatRoomList:: room list change;');
-      print(ChatUserRoomList.instance.rooms);
+      // print(ChatUserRoomList.instance.rooms);
+      if (mounted) setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print('ChatRoomScreen::dispose()');
+    chatUserRoomListSubscription.cancel();
   }
 
   @override

@@ -26,28 +26,11 @@ class ChatUserRoomList extends ChatBase {
   StreamSubscription _myRoomListSubscription;
   List<StreamSubscription> _roomSubscriptions = [];
 
-  /// [fetched] becomes true after it fetches the room list. the room list might
-  /// be empty if there is no chat room for the user.
-  ///
-  /// ```dart
-  /// myRoomList?.fetched != true ? Spinner() : ListView.builder( ... );
-  /// ```
-  // bool fetched = false;
-
   /// My room list including room id.
   List<ChatUserRoom> rooms = [];
   String _order = "createdAt";
-  // ChatUserRoomList({
-  //   @required Function render,
-  //   String order = "createdAt",
-  // })  : __render = render,
-  //       _order = order {
-  //   listenRoomList();
-  // }
 
-  // _notify() {
-  //   if (__render != null) __render();
-  // }
+  int newMessages = 0;
 
   reset({String order}) {
     if (order != null) {
@@ -56,6 +39,7 @@ class ChatUserRoomList extends ChatBase {
 
     rooms = [];
     _myRoomListSubscription.cancel();
+
     listenRoomList();
   }
 
@@ -69,15 +53,18 @@ class ChatUserRoomList extends ChatBase {
     _myRoomListSubscription =
         myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
       // fetched = true;
+      newMessages = 0;
       changes.add(null);
+
       snapshot.docChanges.forEach((DocumentChange documentChange) {
         final roomInfo = ChatUserRoom.fromSnapshot(documentChange.doc);
 
         if (documentChange.type == DocumentChangeType.added) {
           rooms.add(roomInfo);
+          newMessages += roomInfo.newMessages;
 
           /// When room list is retreived for the first, it will be added to listener.
-          /// This is whey [changes] event happens many times when the app listens to room list.
+          /// This is where [changes] event happens many times when the app listens to room list.
           _roomSubscriptions.add(
             globalRoomDoc(roomInfo.id).snapshots().listen(
               (DocumentSnapshot snapshot) {

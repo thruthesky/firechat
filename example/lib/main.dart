@@ -1,5 +1,7 @@
+import 'package:badges/badges.dart';
 import 'package:example/screens/chat.room.list.screen.dart';
 import 'package:example/screens/chat.room.screen.dart';
+import 'package:example/services/defines.dart';
 import 'package:firechat/firechat.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,15 +39,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final String a = '7kYRMUhRJGPV47u2hCDrauoHSMk1';
-  final String b = '4MB8M3mbLlQ9J70Mbp5BW5p3fnD2';
-  final String c = 'yUzkXHvNPTVgYiE21rn78aWURZF3';
-  final String d = 'FvLmXDDpUkfYvHlLnm61KuEDpGC2';
-  final String aEmail = 'aaaa@test.com';
-  final String bEmail = 'bbbb@test.com';
-  final String cEmail = 'cccc@test.com';
-  final String dEmail = 'dddd@test.com';
-  final String password = '12345a';
+  String get loginUserUid =>
+      FirebaseAuth.instance.currentUser == null ? null : FirebaseAuth.instance.currentUser.uid;
 
   @override
   void initState() {
@@ -65,19 +60,19 @@ class _MyHomePageState extends State<MyHomePage> {
       // () async {
       //   try {
       //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: aEmail, password: password);
-      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'A');
+      //     await FirebaseAuth.instance.currentUser.updateProfile(senderDisplayName: 'A');
       //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: bEmail, password: password);
-      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'B');
+      //     await FirebaseAuth.instance.currentUser.updateProfile(senderDisplayName: 'B');
       //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: cEmail, password: password);
-      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'C');
+      //     await FirebaseAuth.instance.currentUser.updateProfile(senderDisplayName: 'C');
       //     await FirebaseAuth.instance.signInWithEmailAndPassword(email: dEmail, password: password);
-      //     await FirebaseAuth.instance.currentUser.updateProfile(displayName: 'D');
+      //     await FirebaseAuth.instance.currentUser.updateProfile(senderDisplayName: 'D');
       //   } catch (e) {
       //     print(e);
       //   }
       // }();
 
-      /// When room information of the current room where the login user is in changes, it will be handled here.
+      // / When room information of the current room where the login user is in changes, it will be handled here.
       ChatRoom.instance.globalRoomChanges.listen((rooms) {
         print('global rooms;');
         print(rooms);
@@ -102,6 +97,27 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: StreamBuilder(
+                stream: ChatUserRoomList.instance.changes,
+                builder: (_, snapshot) {
+                  // if (snapshot.hasData == false) return SizedBox.shrink();
+                  return Badge(
+                    showBadge: ChatUserRoomList.instance.newMessages > 0,
+                    badgeColor: Colors.yellow[700],
+                    toAnimate: false,
+                    badgeContent: Text(ChatUserRoomList.instance.newMessages.toString()),
+                    child: Icon(Icons.chat),
+                  );
+                }),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatRoomListScreen(),
+                )),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -111,14 +127,14 @@ class _MyHomePageState extends State<MyHomePage> {
               Text(
                 'Firechat Functionality\n'
                 '- [Done] 1:1 chat with same room\n'
-                '- 1:1 chat with new room\n'
-                '- Multi user chat with same room\n'
-                '- Multi user chat with new room\n'
+                '- [Done] 1:1 chat with new room\n'
+                '- [Done] Multi user chat with same room\n'
+                '- [Done] Multi user chat with new room\n'
                 '- Room information (like title) change.\n'
-                '- User invitation\n'
-                '- Kicking out a user\n'
+                '- [Done] User invitation\n'
+                '- [Done] Kicking out a user\n'
                 '- [Done] Block a user\n'
-                '- Set a user as admin\n'
+                '- [Done] Set a user as admin\n'
                 '- When admin leave the room, one of other user automatically becomes admin\n'
                 '- [Done] Listening changes of room list and showing new messages.'
                 '- Room password lock\n',
@@ -128,60 +144,222 @@ class _MyHomePageState extends State<MyHomePage> {
                 '${user?.displayName}'
                 "-${user?.uid}",
               ),
-              TextButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(email: aEmail, password: password);
-                  setState(() {});
-                },
-                child: Text('Login as UserA'),
+              Column(
+                children: [
+                  Text('Login As'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(email: aEmail, password: password);
+                          setState(() {});
+                        },
+                        child: Text('UserA'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(email: bEmail, password: password);
+                          setState(() {});
+                        },
+                        child: Text('UserB'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(email: cEmail, password: password);
+                          setState(() {});
+                        },
+                        child: Text('UserC'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(email: dEmail, password: password);
+                          setState(() {});
+                        },
+                        child: Text('UserD'),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  Text('Chat Same Room with'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatRoomScreen(
+                                  users: [a],
+                                  senderDisplayName: 'User A',
+                                  hatch: false,
+                                ),
+                              ));
+                        },
+                        child: Text('User A'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatRoomScreen(
+                                  users: [b],
+                                  senderDisplayName: 'User B',
+                                  hatch: false,
+                                ),
+                              ));
+                        },
+                        child: Text('User B'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatRoomScreen(
+                                  users: [c],
+                                  senderDisplayName: 'User C',
+                                  hatch: false,
+                                ),
+                              ));
+                        },
+                        child: Text('User C'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatRoomScreen(
+                                  users: [d],
+                                  senderDisplayName: 'User D',
+                                  hatch: false,
+                                ),
+                              ));
+                        },
+                        child: Text('User D'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text('Chat New Room with'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatRoomScreen(users: [a], senderDisplayName: 'User A'),
+                              ));
+                        },
+                        child: Text('User A'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatRoomScreen(users: [b], senderDisplayName: 'User B'),
+                              ));
+                        },
+                        child: Text('User B'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatRoomScreen(users: [c], senderDisplayName: 'User C'),
+                              ));
+                        },
+                        child: Text('User C'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatRoomScreen(users: [d], senderDisplayName: 'User D'),
+                              ));
+                        },
+                        child: Text('User D'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      Text('Group Chat with'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatRoomScreen(
+                                      users: [a, b, c, d],
+                                      senderDisplayName: 'ABCD',
+                                      hatch: false,
+                                    ),
+                                  ));
+                            },
+                            child: Text('ABCD Same Room'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text('Group Chat With'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatRoomScreen(
+                                      users: [a, b, c, d],
+                                      senderDisplayName: 'ABCD',
+                                    ),
+                                  ));
+                            },
+                            child: Text('ABCD New Room'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
               TextButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(email: bEmail, password: password);
-                  setState(() {});
-                },
-                child: Text('Login as UserB'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(email: cEmail, password: password);
-                  setState(() {});
-                },
-                child: Text('Login as UserC'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(email: dEmail, password: password);
-                  setState(() {});
-                },
-                child: Text('Login as UserD'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatRoomScreen(uid: a, displayName: 'User A'),
-                      ));
-                },
-                child: Text('Chat User A'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatRoomScreen(uid: b, displayName: 'User B'),
-                      ));
-                },
-                child: Text('Chat User B'),
-              ),
-              TextButton(
-                onPressed: () async {
+                onPressed: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -193,6 +371,8 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
+
+                  // ChatUserRoomList.instance.reset();
                   setState(() {});
                 },
                 child: Text('Log Out'),

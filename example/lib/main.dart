@@ -372,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
 
-                  // ChatUserRoomList.instance.reset();
+                  ChatUserRoomList.instance.reset();
                   setState(() {});
                 },
                 child: Text('Log Out'),

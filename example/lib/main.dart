@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:badges/badges.dart';
 import 'package:example/screens/chat.room.list.screen.dart';
 import 'package:example/screens/chat.room.screen.dart';
@@ -31,7 +33,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
   final String title;
 
   @override
@@ -39,13 +40,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  StreamSubscription globalRoomSubscription;
+  StreamSubscription chatRoomSubscription;
+  StreamSubscription chatRoomListSubscription;
+
   String get loginUserUid =>
       FirebaseAuth.instance.currentUser == null ? null : FirebaseAuth.instance.currentUser.uid;
 
   @override
   void initState() {
     super.initState();
-    Firebase.initializeApp().then((x) {
+    Firebase.initializeApp().then((firebase) {
       // FireChatTest().runAllTests();
       // FireChatTest().chatWithMyself();
       // FireChatTest().sendMessageTestA();
@@ -73,21 +78,44 @@ class _MyHomePageState extends State<MyHomePage> {
       // }();
 
       // / When room information of the current room where the login user is in changes, it will be handled here.
-      ChatRoom.instance.globalRoomChanges.listen((rooms) {
-        print('global rooms;');
-        print(rooms);
-      });
 
-      ChatRoom.instance.changes.listen((value) {
-        print('room changes;');
-        print(value);
+      FirebaseAuth.instance.authStateChanges().listen((User user) {
+        if (user == null) {
+          unsubscribeChat();
+          ChatRoom.instance.unsubscribe();
+          ChatUserRoomList.instance.unsubscribe();
+        } else {
+          subscribeChat();
+        }
       });
+    });
+  }
 
-      /// When any of the login user's rooms changes, it will be handled here.
-      ChatUserRoomList.instance.changes.listen((rooms) {
-        print('room list change;');
-        print(rooms);
-      });
+  unsubscribeChat() {
+    globalRoomSubscription.cancel();
+    chatRoomSubscription.cancel();
+    chatRoomListSubscription.cancel();
+
+    globalRoomSubscription = null;
+    chatRoomSubscription = null;
+    chatRoomListSubscription = null;
+  }
+
+  subscribeChat() {
+    globalRoomSubscription = ChatRoom.instance.globalRoomChanges.listen((rooms) {
+      print('global rooms;');
+      print(rooms);
+    });
+
+    chatRoomSubscription = ChatRoom.instance.changes.listen((value) {
+      print('room changes;');
+      print(value);
+    });
+
+    /// When any of the login user's rooms changes, it will be handled here.
+    chatRoomListSubscription = ChatUserRoomList.instance.changes.listen((rooms) {
+      print('room list change;');
+      print(rooms);
     });
   }
 

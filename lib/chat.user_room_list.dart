@@ -95,7 +95,7 @@ class ChatUserRoomList extends ChatBase {
     });
   }
 
-  leave() {
+  unsubscribe() {
     if (_myRoomListSubscription != null) _myRoomListSubscription.cancel();
     if (_roomSubscriptions.isNotEmpty) {
       _roomSubscriptions.forEach((element) {

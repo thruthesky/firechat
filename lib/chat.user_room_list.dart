@@ -16,7 +16,7 @@ class ChatUserRoomList extends ChatBase {
 
   ChatUserRoomList._internal() {
     print('=> ChatUserRoomList._internal(). This must be called only once.');
-    listenRoomList();
+    if (isLogin) listenRoomList();
   }
 
   // Function __render;

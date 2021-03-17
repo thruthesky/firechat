@@ -80,6 +80,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 icon: Icon(Icons.exit_to_app),
                 onPressed: () {
                   ChatRoom.instance.leave();
+                  Navigator.pop(context);
                 }),
           ]),
       body: ChatMessageListWidget(

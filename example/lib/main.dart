@@ -82,8 +82,6 @@ class _MyHomePageState extends State<MyHomePage> {
       FirebaseAuth.instance.authStateChanges().listen((User user) {
         if (user == null) {
           unsubscribeChat();
-          ChatRoom.instance.unsubscribe();
-          ChatUserRoomList.instance.unsubscribe();
         } else {
           subscribeChat();
         }
@@ -92,13 +90,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   unsubscribeChat() {
-    globalRoomSubscription.cancel();
-    chatRoomSubscription.cancel();
-    chatRoomListSubscription.cancel();
+    if (globalRoomSubscription != null) {
+      globalRoomSubscription.cancel();
+      globalRoomSubscription = null;
+    }
+    if (chatRoomSubscription != null) {
+      chatRoomSubscription.cancel();
+      chatRoomSubscription = null;
+    }
 
-    globalRoomSubscription = null;
-    chatRoomSubscription = null;
-    chatRoomListSubscription = null;
+    if (chatRoomListSubscription != null) {
+      chatRoomListSubscription.cancel();
+      chatRoomListSubscription = null;
+    }
   }
 
   subscribeChat() {
@@ -399,8 +403,6 @@ class _MyHomePageState extends State<MyHomePage> {
               TextButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
-
-                  ChatUserRoomList.instance.reset();
                   setState(() {});
                 },
                 child: Text('Log Out'),

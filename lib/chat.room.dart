@@ -626,8 +626,10 @@ class ChatRoom extends ChatBase {
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
+
     // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
     unsubscribe();
+
     // Delete the room that the user is leaving from. (Not the global room.)
     await myRoom(id).delete();
   }

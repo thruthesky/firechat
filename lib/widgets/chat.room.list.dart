@@ -21,7 +21,6 @@ class _ChatRoomListWidgetState extends State<ChatRoomListWidget> {
   @override
   void initState() {
     super.initState();
-    ChatUserRoomList.instance.reset();
 
     /// When any of the login user's rooms changes, it will be handled here.
     chatUserRoomListSubscription = ChatUserRoomList.instance.changes.listen((rooms) {

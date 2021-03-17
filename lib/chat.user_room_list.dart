@@ -16,7 +16,14 @@ class ChatUserRoomList extends ChatBase {
 
   ChatUserRoomList._internal() {
     print('=> ChatUserRoomList._internal(). This must be called only once.');
-    if (isLogin) listenRoomList();
+    FirebaseAuth.instance.authStateChanges().listen((User user) {
+      if (user == null) {
+        _unsubscribe();
+      } else {
+        _reset();
+        _listenRoomList();
+      }
+    });
   }
 
   // Function __render;
@@ -32,15 +39,15 @@ class ChatUserRoomList extends ChatBase {
 
   int newMessages = 0;
 
-  reset({String order}) {
+  _reset({String order}) {
     if (order != null) {
       _order = order;
     }
-
     rooms = [];
-    _myRoomListSubscription.cancel();
-
-    listenRoomList();
+    if (_myRoomListSubscription != null) {
+      _myRoomListSubscription.cancel();
+      _myRoomListSubscription = null;
+    }
   }
 
   /// Listen to global room updates.
@@ -49,7 +56,7 @@ class ChatUserRoomList extends ChatBase {
   /// - title changes,
   /// - users array changes,
   /// - and other properties change.
-  listenRoomList() {
+  _listenRoomList() {
     _myRoomListSubscription =
         myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
       // fetched = true;
@@ -95,7 +102,7 @@ class ChatUserRoomList extends ChatBase {
     });
   }
 
-  unsubscribe() {
+  _unsubscribe() {
     if (_myRoomListSubscription != null) _myRoomListSubscription.cancel();
     if (_roomSubscriptions.isNotEmpty) {
       _roomSubscriptions.forEach((element) {

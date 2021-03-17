@@ -3,6 +3,8 @@ part of './firechat.dart';
 class ChatBase {
   String get loginUserUid =>
       FirebaseAuth.instance.currentUser == null ? null : FirebaseAuth.instance.currentUser.uid;
+
+  bool get isLogin => FirebaseAuth.instance.currentUser != null;
   FirebaseFirestore get db => FirebaseFirestore.instance;
 
   int page = 0;

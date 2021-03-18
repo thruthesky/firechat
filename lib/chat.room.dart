@@ -190,6 +190,7 @@ class ChatRoom extends ChatBase {
       }
     }
 
+    ///
     _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
       /// Scroll down for new message(s)
       ///
@@ -620,10 +621,12 @@ class ChatRoom extends ChatBase {
     //
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
 
+    // If there is only one user left (which is himself), then he can leave without setting other user to admin.
+
     // if the last moderator tries to leave, ask the moderator to add another user to moderator.
-    if (_globalRoom.moderators.contains(loginUserUid) && _globalRoom.moderators.length == 1) {
-      throw ADD_NEW_MODERATOR_BEFORE_YOU_LEAVE;
-    }
+    // if (_globalRoom.moderators.contains(loginUserUid) && _globalRoom.moderators.length == 1) {
+    //   throw ADD_NEW_MODERATOR_BEFORE_YOU_LEAVE;
+    // }
 
     // Update last message of room users that the user is leaving.
     await sendMessage(
@@ -632,13 +635,16 @@ class ChatRoom extends ChatBase {
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
 
-    // add newModerator if the last moderator tries to leave.
-    // if (_globalRoom.moderators.contains(loginUserUid)) {
-    //   // if (_globalRoom.moderators.length == 1) {
-    //   //   await addModerator(_globalRoom.users.first);
-    //   // }
-    //   await removeModerator(loginUserUid);
-    // }
+    // A moderator leaves the room?
+    if (_globalRoom.moderators.contains(loginUserUid)) {
+      // There is no more moderator for the room? but there are more than 2 uesrs?
+      if (_globalRoom.moderators.length == 1 && _globalRoom.users.length >= 2) {
+        // Then, set the first one (not the moderator) to moderator.
+        await addModerator(_globalRoom.users.first);
+      }
+      // Then, remove himself from moderator.
+      await removeModerator(loginUserUid);
+    }
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});

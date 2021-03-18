@@ -617,12 +617,25 @@ class ChatRoom extends ChatBase {
     //
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
 
+    // if the last moderator tries to leave, ask the moderator to add another user to moderator.
+    if (_globalRoom.moderators.contains(loginUserUid) && _globalRoom.moderators.length == 1) {
+      throw ADD_NEW_MODERATOR_BEFORE_YOU_LEAVE;
+    }
+
     // Update last message of room users that the user is leaving.
     await sendMessage(
         text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
 
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
+
+    // add newModerator if the last moderator tries to leave.
+    if (_globalRoom.moderators.contains(loginUserUid)) {
+      // if (_globalRoom.moderators.length == 1) {
+      //   await addModerator(_globalRoom.users.first);
+      // }
+      await removeModerator(loginUserUid);
+    }
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});

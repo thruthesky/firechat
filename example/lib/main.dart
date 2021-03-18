@@ -162,13 +162,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 '- [Done] 1:1 chat with new room\n'
                 '- [Done] Multi user chat with same room\n'
                 '- [Done] Multi user chat with new room\n'
-                '- Room information (like title) change.\n'
                 '- [Done] User invitation\n'
                 '- [Done] Kicking out a user\n'
                 '- [Done] Block a user\n'
                 '- [Done] Set a user as admin\n'
+                '- [Done] Listening changes of room list and showing new messages.\n'
                 '- When admin leave the room, one of other user automatically becomes admin\n'
-                '- [Done] Listening changes of room list and showing new messages.'
+                '- Room information (like title) change.\n'
                 '- Room password lock\n',
               ),
               Text(
@@ -184,6 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       TextButton(
                         onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(email: aEmail, password: password);
                           setState(() {});
@@ -192,6 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       TextButton(
                         onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(email: bEmail, password: password);
                           setState(() {});
@@ -200,6 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       TextButton(
                         onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(email: cEmail, password: password);
                           setState(() {});
@@ -208,6 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       TextButton(
                         onPressed: () async {
+                          await FirebaseAuth.instance.signOut();
                           await FirebaseAuth.instance
                               .signInWithEmailAndPassword(email: dEmail, password: password);
                           setState(() {});

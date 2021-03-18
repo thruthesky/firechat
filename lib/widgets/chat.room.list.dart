@@ -44,8 +44,6 @@ class _ChatRoomListWidgetState extends State<ChatRoomListWidget> {
         ? ListView.builder(
             itemCount: rooms.length,
             itemBuilder: (_, i) {
-              // return ListTile(title: Text('i: $i'));
-
               final ChatUserRoom room = rooms[i];
               return ChatRoomViewWidget(room, onTap: () {
                 if (widget.onChatRoomTap != null) widget.onChatRoomTap(room);

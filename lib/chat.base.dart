@@ -74,7 +74,7 @@ class ChatBase {
     return text;
   }
 
-  /// Returns the room list info `/chat/room/list/{roomId}` document.
+  /// Returns the room list info `/chat/global-rooms/list/{roomId}` document.
   ///
   /// If the room does not exists, it returns null.
   /// The return value has `id` as its room id.

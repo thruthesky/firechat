@@ -60,16 +60,12 @@ class ChatUserRoomList extends ChatBase {
   _listenRoomList() {
     _myRoomListSubscription =
         myRoomListCol.orderBy(_order, descending: true).snapshots().listen((snapshot) {
-      // fetched = true;
-      newMessages = 0;
-      changes.add(null);
-
       snapshot.docChanges.forEach((DocumentChange documentChange) {
         final roomInfo = ChatUserRoom.fromSnapshot(documentChange.doc);
 
+        print(roomInfo.newMessages);
         if (documentChange.type == DocumentChangeType.added) {
           rooms.add(roomInfo);
-          newMessages += roomInfo.newMessages;
 
           /// When room list is retreived for the first, it will be added to listener.
           /// This is where [changes] event happens many times when the app listens to room list.
@@ -99,6 +95,23 @@ class ChatUserRoomList extends ChatBase {
           assert(false, 'This is error');
         }
       });
+
+      // // get total newMessages and can be use to display like badge.
+      // myRoomListCol.where('newMessages', isGreaterThan: 0).get().then((snapshot) {
+      //   print("myRoomListCol.where('newMessages', isGreaterThan: 0)");
+      //   newMessages = 0;
+      //   snapshot.docs.forEach((documentSnapshot) {
+      //     final roomInfo = ChatUserRoom.fromSnapshot(documentSnapshot);
+      //     newMessages += roomInfo.newMessages;
+      //   });
+      //   changes.add(null);
+      // });
+
+      newMessages = 0;
+      rooms.forEach((roomInfo) {
+        newMessages += roomInfo.newMessages;
+      });
+
       changes.add(null);
     });
   }
@@ -110,5 +123,6 @@ class ChatUserRoomList extends ChatBase {
         element.cancel();
       });
     }
+    newMessages = 0;
   }
 }

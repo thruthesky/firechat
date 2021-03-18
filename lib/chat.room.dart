@@ -633,12 +633,12 @@ class ChatRoom extends ChatBase {
     _globalRoom.users.remove(loginUserUid);
 
     // add newModerator if the last moderator tries to leave.
-    if (_globalRoom.moderators.contains(loginUserUid)) {
-      // if (_globalRoom.moderators.length == 1) {
-      //   await addModerator(_globalRoom.users.first);
-      // }
-      await removeModerator(loginUserUid);
-    }
+    // if (_globalRoom.moderators.contains(loginUserUid)) {
+    //   // if (_globalRoom.moderators.length == 1) {
+    //   //   await addModerator(_globalRoom.users.first);
+    //   // }
+    //   await removeModerator(loginUserUid);
+    // }
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});

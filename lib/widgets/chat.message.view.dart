@@ -72,8 +72,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
             mainAxisAlignment:
                 widget.message.isMine ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
-              // Api.instance.chat.isMessageOnEdit(widget.message)
-              isMessageOnEdit
+              ChatRoom.instance.isMessageOnEdit(widget.message)
                   ? GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       child: Padding(
@@ -84,7 +83,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
                         ),
                       ),
                       onTap: () {
-                        // Api.instance.chat.cancelEdit;
+                        ChatRoom.instance.cancelEdit();
                       })
                   : SizedBox(),
               Text(

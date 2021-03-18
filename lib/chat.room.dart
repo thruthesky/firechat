@@ -680,9 +680,26 @@ class ChatRoom extends ChatBase {
   }
 
   editMessage(ChatMessage message) {
+    print('editMessage');
     textController.text = message.text;
     isMessageEdit = message;
-    changes.add(message);
+    _delay.add(message);
+  }
+
+  bool isMessageOnEdit(ChatMessage message) {
+    if (isMessageEdit == null) return false;
+    if (!message.isMine) return false;
+    return message.id == isMessageEdit.id;
+  }
+
+  cancelEdit() {
+    textController.text = '';
+    isMessageEdit = null;
+    _delay.add(null);
+  }
+
+  deleteMessage(ChatMessage message) {
+    print('@todo deleteMessage');
   }
 
   @Deprecated('Use [userRoom]')

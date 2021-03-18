@@ -18,16 +18,15 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
   /// show loader if sending is true
   bool sending = false;
 
-  final textController = TextEditingController();
   dynamic isMessageEdit;
 
   // send a message to the room users
   sendMessage() async {
-    String text = textController.text;
+    String text = ChatRoom.instance.textController.text;
     if (text.isEmpty || sending) return;
     sending = true;
 
-    textController.text = '';
+    ChatRoom.instance.textController.text = '';
 
     try {
       if (isMessageEdit == null) {
@@ -75,7 +74,7 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
               uploadIconButton(),
               Expanded(
                 child: TextFormField(
-                  controller: textController,
+                  controller: ChatRoom.instance.textController,
                   onEditingComplete: sendMessage,
                   decoration: InputDecoration(
                     hintText: "Please enter your message.",

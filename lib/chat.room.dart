@@ -89,6 +89,7 @@ class ChatRoom extends ChatBase {
   /// push notification topic name
   String get topic => 'notifyChat-${this.id}';
 
+  final textController = TextEditingController();
   final scrollController = ScrollController();
 
   /// When keyboard(keypad) is open, the app needs to adjust the scroll.
@@ -108,6 +109,8 @@ class ChatRoom extends ChatBase {
             duration: Duration(milliseconds: ms), curve: Curves.ease);
     });
   }
+
+  ChatMessage isMessageEdit;
 
   /// Enter chat room
   ///
@@ -282,7 +285,7 @@ class ChatRoom extends ChatBase {
     // }
     // if (_render != null) _render();
 
-    changes.add(null);
+    // changes.add(null);
   }
 
   /// Fetch previous messages
@@ -674,6 +677,12 @@ class ChatRoom extends ChatBase {
     } else {
       throw ROOM_NOT_EXISTS;
     }
+  }
+
+  editMessage(ChatMessage message) {
+    textController.text = message.text;
+    isMessageEdit = message;
+    changes.add(message);
   }
 
   @Deprecated('Use [userRoom]')

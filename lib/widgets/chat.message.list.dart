@@ -53,7 +53,7 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
       behavior: HitTestBehavior.opaque,
       child: ChatMessageViewWidget(message: message, onImageRenderCompelete: imageRenderComplete),
       onTapDown: _storePosition,
-      onLongPress: () => onLongPressShowMenu(message),
+      onLongPress: () => {}, //onLongPressShowMenu(message),
     );
   }
 
@@ -97,10 +97,10 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
       ).then((value) {
         if (value == null) return;
         if (value == 'delete') {
-          // Api.instance.chat.deleteMessage(message);
+          // ChatRoom.instance.deleteMessage(message);
         }
         if (value == 'edit') {
-          // Api.instance.chat.editMessage(message);
+          // ChatRoom.instance.editMessage(message);
         }
       });
     }

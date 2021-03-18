@@ -52,42 +52,74 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Row(
-            children: [
-              // UserAvatar(
-              //   api?.chat?.otherUser?.photoUrl ?? '',
-              //   size: 34,
-              // ),
-              SizedBox(
-                width: 4,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            // UserAvatar(
+            //   api?.chat?.otherUser?.photoUrl ?? '',
+            //   size: 34,
+            // ),
+            SizedBox(
+              width: 4,
+            ),
+            Expanded(
+              child: Text(
+                ChatRoom.instance.id ?? '',
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              Expanded(
-                child: Text(
-                  ChatRoom.instance.id ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            AddNewUser(),
-            KickUser(),
-            BlockUser(),
-            AddModerator(),
-            RemoveModerator(),
-            IconButton(
-                icon: Icon(Icons.exit_to_app),
-                onPressed: () {
-                  ChatRoom.instance.leave();
-                  Navigator.pop(context);
-                }),
-          ]),
+            ),
+          ],
+        ),
+      ),
       body: ChatMessageListWidget(
         onImageRenderCompelete: () {},
         onError: (e) => print(e),
       ),
+      endDrawer: ChatRoomDrawer(),
     );
+  }
+}
+
+class ChatRoomDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+        child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          margin: EdgeInsets.zero,
+          child: Text('Chat Room Options'),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+        ),
+        AddNewUser(),
+        KickUser(),
+        BlockUser(),
+        AddModerator(),
+        RemoveModerator(),
+        ListTile(
+          leading: Icon(Icons.edit),
+          title: Text('Edit Room'),
+          onTap: () {
+            print('edit room');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.exit_to_app),
+          title: Text('Leave Room'),
+          onTap: () {
+            ChatRoom.instance.leave();
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    ));
   }
 }
 
@@ -95,12 +127,12 @@ class AddNewUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.person_add),
+      child: ListTile(
+        leading: Icon(Icons.person_add),
+        title: Text('Add User'),
+      ),
       itemBuilder: (context) {
         return [
-          // PopupMenuItem(
-          //   child: Text('Add New User'),
-          // ),
           for (var uid in users.keys)
             PopupMenuItem(
               child: TextButton(
@@ -126,7 +158,10 @@ class KickUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.person_remove),
+      child: ListTile(
+        leading: Icon(Icons.person_remove),
+        title: Text('Remove User'),
+      ),
       itemBuilder: (context) {
         return [
           for (var uid in ChatRoom.instance.global.users)
@@ -154,7 +189,10 @@ class BlockUser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.block),
+      child: ListTile(
+        leading: Icon(Icons.block),
+        title: Text('Block User'),
+      ),
       itemBuilder: (context) {
         return [
           for (var uid in ChatRoom.instance.global.users)
@@ -182,7 +220,10 @@ class AddModerator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.add_moderator),
+      child: ListTile(
+        leading: Icon(Icons.add_moderator),
+        title: Text('Add Moderator'),
+      ),
       itemBuilder: (context) {
         return [
           for (var uid in ChatRoom.instance.global.users)
@@ -210,7 +251,10 @@ class RemoveModerator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      icon: Icon(Icons.remove_moderator),
+      child: ListTile(
+        leading: Icon(Icons.remove_moderator),
+        title: Text('Remove Moderator'),
+      ),
       itemBuilder: (context) {
         return [
           for (var uid in ChatRoom.instance.global.moderators)

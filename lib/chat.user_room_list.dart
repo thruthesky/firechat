@@ -43,6 +43,7 @@ class ChatUserRoomList extends ChatBase {
     if (order != null) {
       _order = order;
     }
+    newMessages = 0;
     rooms = [];
     if (_myRoomListSubscription != null) {
       _myRoomListSubscription.cancel();

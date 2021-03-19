@@ -685,6 +685,20 @@ class ChatRoom extends ChatBase {
     }
   }
 
+  Future<void> updateTitle(String title) async {
+    ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
+
+    if (_globalRoom.moderators.contains(loginUserUid) == false) throw YOU_ARE_NOT_MODERATOR;
+
+    // Update users after removing himself.
+    await globalRoomDoc(_globalRoom.roomId).update({'title': title});
+
+    await sendMessage(
+        text: ChatProtocol.titleChanged,
+        displayName: loginUserUid,
+        extra: {'userName': loginUserUid});
+  }
+
   editMessage(ChatMessage message) {
     print('editMessage');
     textController.text = message.text;

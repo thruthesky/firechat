@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:example/screens/chat.room.settings.screen.dart';
 import 'package:example/services/defines.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ),
             Expanded(
               child: Text(
-                ChatRoom.instance.id ?? '',
+                ChatRoom.instance.title ?? ChatRoom.instance.id,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -107,7 +108,15 @@ class ChatRoomDrawer extends StatelessWidget {
           leading: Icon(Icons.edit),
           title: Text('Edit Room'),
           onTap: () {
-            print('edit room');
+            print('edit Room');
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatRoomSettingsScreen(
+                    chatRoom: ChatRoom.instance.global,
+                  ),
+                ));
           },
         ),
         ListTile(

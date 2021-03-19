@@ -8,4 +8,5 @@ class ChatProtocol {
   static String kickout = 'ChatProtocol.kickout';
   static String block = 'ChatProtocol.block';
   static String roomCreated = 'ChatProtocol.roomCreated';
+  static String titleChanged = 'ChatProtocol.titleChanged';
 }

@@ -31,7 +31,7 @@ class ChatUserRoomList extends ChatBase {
   BehaviorSubject changes = BehaviorSubject.seeded(null);
 
   StreamSubscription _myRoomListSubscription;
-  List<StreamSubscription> _roomSubscriptions = [];
+  Map<String, StreamSubscription> _roomSubscriptions = {};
 
   /// My room list including room id.
   List<ChatUserRoom> rooms = [];
@@ -69,15 +69,13 @@ class ChatUserRoomList extends ChatBase {
 
           /// When room list is retreived for the first, it will be added to listener.
           /// This is where [changes] event happens many times when the app listens to room list.
-          _roomSubscriptions.add(
-            globalRoomDoc(roomInfo.id).snapshots().listen(
-              (DocumentSnapshot snapshot) {
-                int found = rooms.indexWhere((r) => r.id == roomInfo.id);
-                rooms[found].global = ChatGlobalRoom.fromSnapshot(snapshot);
-                // snapshot.data();
-                changes.add(null);
-              },
-            ),
+          _roomSubscriptions[roomInfo.id] = globalRoomDoc(roomInfo.id).snapshots().listen(
+            (DocumentSnapshot snapshot) {
+              int found = rooms.indexWhere((r) => r.id == roomInfo.id);
+              rooms[found].global = ChatGlobalRoom.fromSnapshot(snapshot);
+              // snapshot.data();
+              changes.add(null);
+            },
           );
         } else if (documentChange.type == DocumentChangeType.modified) {
           int found = rooms.indexWhere((r) => r.id == roomInfo.id);
@@ -119,10 +117,22 @@ class ChatUserRoomList extends ChatBase {
   _unsubscribe() {
     if (_myRoomListSubscription != null) _myRoomListSubscription.cancel();
     if (_roomSubscriptions.isNotEmpty) {
-      _roomSubscriptions.forEach((element) {
-        element.cancel();
-      });
+      for (final key in _roomSubscriptions.keys) {
+        _roomSubscriptions[key].cancel();
+      }
+      _roomSubscriptions = {};
+      // _roomSubscriptions.foreach((element) {
+      //    _roomSubscriptions[k].cancel();
+      // });
     }
     newMessages = 0;
+  }
+
+  unsubscribeUserRoom(ChatGlobalRoom room) {
+    if (_roomSubscriptions.isEmpty) return;
+    if (_roomSubscriptions[room.roomId] == null) return;
+
+    _roomSubscriptions[room.roomId].cancel();
+    _roomSubscriptions.removeWhere((String key, dynamic value) => key == room.roomId);
   }
 }

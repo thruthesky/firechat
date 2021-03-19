@@ -54,6 +54,8 @@ class _ChatRoomSettingsScreenState extends State<ChatRoomSettingsScreen> {
                     print(textController.text);
                     try {
                       await ChatRoom.instance.updateTitle(textController.text);
+                      Navigator.pop(context);
+                      print('Success');
                     } catch (e) {
                       print('updating title failed');
                       print(e);

@@ -7,12 +7,10 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ChatMessageListWidget extends StatefulWidget {
   ChatMessageListWidget({
-    this.onImageRenderCompelete,
     this.onError,
     Key key,
   }) : super(key: key);
 
-  final Function onImageRenderCompelete;
   final Function onError;
 
   @override
@@ -51,14 +49,14 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
   Widget myMessage(message) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      child: ChatMessageViewWidget(message: message, onImageRenderCompelete: imageRenderComplete),
+      child: ChatMessageViewWidget(message: message),
       onTapDown: _storePosition,
       onLongPress: () => onLongPressShowMenu(message),
     );
   }
 
   Widget otherMessage(message) {
-    return ChatMessageViewWidget(message: message, onImageRenderCompelete: imageRenderComplete);
+    return ChatMessageViewWidget(message: message);
   }
 
   void _storePosition(TapDownDetails details) {
@@ -104,13 +102,5 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
         }
       });
     }
-  }
-
-  void imageRenderComplete() {
-    // if (Api.instance.chat.atBottom || Api.instance.chat.pageNo == 1) {
-    //   Api.instance.chat.lastImage = '';
-    //   Api.instance.chat.scrollToBottom();
-    // }
-    if (widget.onImageRenderCompelete != null) widget.onImageRenderCompelete();
   }
 }

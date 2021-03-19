@@ -112,6 +112,9 @@ class ChatRoom extends ChatBase {
 
   ChatMessage isMessageEdit;
 
+  // this will use to wait until the image is properly loaded before it scroll to bottom
+  String lastImage;
+
   /// Enter chat room
   ///
   /// If [hatch] is set to true, then it will always create new room even if you are talking to
@@ -694,9 +697,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'title': title});
 
     await sendMessage(
-        text: ChatProtocol.titleChanged,
-        displayName: loginUserUid,
-        extra: {'userName': loginUserUid});
+        text: ChatProtocol.titleChanged, displayName: loginUserUid, extra: {'newTitle': title});
   }
 
   editMessage(ChatMessage message) {
@@ -732,6 +733,14 @@ class ChatRoom extends ChatBase {
   /// Note that `getMyRoomInfo()` returns `ChatRoomInfo` while `myRoom()`
   /// returns document reference.
   Future<ChatUserRoom> get userRoom => getMyRoomInfo(loginUserUid, id);
+
+  void imageRenderComplete() {
+    if (ChatRoom.instance.atBottom || ChatRoom.instance.page == 1) {
+      ChatRoom.instance.lastImage = '';
+      ChatRoom.instance.scrollToBottom();
+    }
+    _delay.add(null);
+  }
 
   bool get atBottom {
     return scrollController.offset > (scrollController.position.maxScrollExtent - 640);

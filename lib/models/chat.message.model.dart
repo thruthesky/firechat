@@ -14,6 +14,7 @@ class ChatMessage {
   String text;
   bool isMine;
   bool isImage;
+  Map<String, dynamic> data;
 
   ChatMessage({
     this.id,
@@ -25,6 +26,7 @@ class ChatMessage {
     this.text,
     this.isMine,
     this.isImage,
+    this.data,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
     bool isImage = false;
@@ -46,6 +48,7 @@ class ChatMessage {
       text: data['text'] ?? '',
       isMine: data['senderUid'] == ChatRoom.instance.loginUserUid,
       isImage: isImage,
+      data: data,
     );
   }
 }

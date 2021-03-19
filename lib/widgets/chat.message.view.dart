@@ -11,12 +11,10 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_4.dart';
 class ChatMessageViewWidget extends StatefulWidget {
   ChatMessageViewWidget({
     this.message,
-    this.onImageRenderCompelete,
     Key key,
   }) : super(key: key);
 
   final ChatMessage message;
-  final Function onImageRenderCompelete;
 
   @override
   _ChatMessageViewWidgetState createState() => _ChatMessageViewWidgetState();
@@ -53,14 +51,13 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
                 ? CachedImage(
                     widget.message.text,
                     onLoadComplete: () {
-                      // if (widget.message.text == Api.instance.chat.lastImage) {
-                      //   // print('load compelete for the last image only: ${widget.message.text}');
-                      //   widget.onImageRenderCompelete();
-                      // }
+                      if (widget.message.text != ChatRoom.instance.lastImage) return;
+                      // print('load compelete for the last image only: ${widget.message.text}');
+                      ChatRoom.instance.imageRenderComplete();
                     },
                   )
                 : Text(
-                    widget.message.text,
+                    ChatRoom.instance.text(widget.message),
                     textAlign: widget.message.isMine ? TextAlign.right : TextAlign.left,
                     style: TextStyle(color: Colors.white),
                   ),

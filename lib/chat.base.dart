@@ -57,11 +57,17 @@ class ChatBase {
     return myRoomListCol.doc(roomId);
   }
 
-  text(Map<String, dynamic> message) {
-    String text = message['text'] ?? '';
+  text(ChatMessage message) {
+    String text = message.text ?? '';
 
     if (text == ChatProtocol.roomCreated) {
       text = 'Chat room created. ';
+    }
+    if (text == ChatProtocol.add) {
+      text = message.senderDisplayName + ' added user ' + message.newUsers.join(',');
+    }
+    if (text == ChatProtocol.titleChanged) {
+      text = message.senderDisplayName + ' change room title ' + message.data['newTitle'];
     }
 
     /// Display `no more messages` only when user scrolled up to see more messages.
@@ -69,7 +75,7 @@ class ChatBase {
       text = 'No more messages. ';
     } else if (text == ChatProtocol.enter) {
       // print(message);
-      text = "${message['senderDisplayName']} invited ${message['newUsers']}";
+      text = "${message.senderDisplayName} invited ${message.newUsers}";
     }
     return text;
   }

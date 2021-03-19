@@ -9,4 +9,7 @@ class ChatProtocol {
   static String block = 'ChatProtocol.block';
   static String roomCreated = 'ChatProtocol.roomCreated';
   static String titleChanged = 'ChatProtocol.titleChanged';
+
+  static String addModerator = 'ChatProtocol.addModerator';
+  static String removeModerator = 'ChatProtocol.removeModerator';
 }

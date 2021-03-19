@@ -18,17 +18,6 @@ class ChatRoom extends ChatBase {
     print('=> ChatRoom._internal(). This must be called only once.');
   }
 
-  // /// [render] will be called to notify chat room listener to re-render the screen.
-  // ///
-  // /// For one chat message sending,
-  // /// - [render] will be invoked 2 times on message sender's device due to offline support.
-  // /// - [render] will be invoked 1 times on receiver's device.
-  // ///
-  // /// [globalRoomChange] will be invoked when global chat room changes.
-  // ChatRoom({
-  //   Function render,
-  // }) {}
-
   int _limit = 30;
 
   /// When user scrolls to top to view previous messages, the app fires the scroll event
@@ -282,16 +271,6 @@ class ChatRoom extends ChatBase {
     await sendMessage(text: ChatProtocol.roomCreated, displayName: loginUserUid);
   }
 
-  /// Notify chat room listener to re-render the screen.
-  _notify() {
-    // if (_render != null) {
-    _delay.add(null);
-    // }
-    // if (_render != null) _render();
-
-    // changes.add(null);
-  }
-
   /// Fetch previous messages
   fetchMessages() async {
     if (_throttling || noMoreMessage) return;
@@ -378,7 +357,7 @@ class ChatRoom extends ChatBase {
         }
       });
 
-      _notify();
+      _delay.add(null);
     });
   }
 
@@ -554,8 +533,6 @@ class ChatRoom extends ChatBase {
   }
 
   /// Moderator removes a user
-  ///
-  /// TODO [roomId] should be omitted.
   Future<void> blockUser(String uid, String userName) async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
     _globalRoom.users.remove(uid);
@@ -576,28 +553,32 @@ class ChatRoom extends ChatBase {
   /// Only moderator can add a user to moderator.
   /// The user must be included in `users` array.
   ///
-  /// Todo move this method to `ChatRoom`
-  Future<void> addModerator(String uid) async {
+  Future<void> addModerator(String uid, {String userName}) async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
     List<String> moderators = _globalRoom.moderators;
     if (moderators.contains(loginUserUid) == false) throw YOU_ARE_NOT_MODERATOR;
     if (_globalRoom.users.contains(uid) == false) throw MODERATOR_NOT_EXISTS_IN_USERS;
     moderators.add(uid);
     await globalRoomDoc(id).update({'moderators': moderators});
+    await sendMessage(
+        text: ChatProtocol.addModerator,
+        displayName: loginUserUid,
+        extra: {'userName': userName ?? uid});
   }
 
   /// Remove a moderator.
   ///
   /// Only moderator can remove a moderator.
-  ///
-  /// Todo move this method to `ChatRoom`
-  Future<void> removeModerator(String uid) async {
+  Future<void> removeModerator(String uid, {String userName}) async {
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
     List<String> moderators = _globalRoom.moderators;
     moderators.remove(uid);
     await globalRoomDoc(id).update({'moderators': moderators});
 
-    // TODO inform it to all users by sending message
+    await sendMessage(
+        text: ChatProtocol.removeModerator,
+        displayName: loginUserUid,
+        extra: {'userName': userName ?? uid});
   }
 
   /// User go out of a room. The user is no longer part of the room
@@ -616,9 +597,6 @@ class ChatRoom extends ChatBase {
   /// But admin can remove other users.
   ///
   ///
-  /// TODO if moderator is leaving, it needs to remove the uid from moderator.
-  /// TODO if the last moderator tries to leave, ask the moderator to add another user to moderator.
-  /// TODO When a user(or a moderator) leaves the room and there is no user left in the room,
   /// then move the room information from /chat/info/room-list to /chat/info/deleted-room-list.
   Future<void> leave() async {
     //
@@ -676,7 +654,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
     await sendMessage(
-        text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
+        text: ChatProtocol.kickout, displayName: loginUserUid, extra: {'userName': userName});
   }
 
   /// Returns a room of a user.

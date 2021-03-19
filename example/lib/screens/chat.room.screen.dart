@@ -123,6 +123,7 @@ class ChatRoomDrawer extends StatelessWidget {
           leading: Icon(Icons.exit_to_app),
           title: Text('Leave Room'),
           onTap: () {
+            Navigator.pop(context);
             ChatRoom.instance.leave();
             Navigator.pop(context);
           },
@@ -147,6 +148,7 @@ class AddNewUser extends StatelessWidget {
               child: TextButton(
                 child: Text('Add ' + users[uid]),
                 onPressed: () async {
+                  Navigator.pop(context);
                   try {
                     await ChatRoom.instance.addUser({uid: users[uid]});
                   } catch (e) {
@@ -178,6 +180,7 @@ class KickUser extends StatelessWidget {
               child: TextButton(
                 child: Text('KickOut ' + users[uid]),
                 onPressed: () async {
+                  Navigator.pop(context);
                   try {
                     await ChatRoom.instance.kickout(uid, users[uid]);
                   } catch (e) {
@@ -209,6 +212,7 @@ class BlockUser extends StatelessWidget {
               child: TextButton(
                 child: Text('Block ' + users[uid]),
                 onPressed: () async {
+                  Navigator.pop(context);
                   try {
                     await ChatRoom.instance.blockUser(uid, users[uid]);
                   } catch (e) {
@@ -240,6 +244,7 @@ class AddModerator extends StatelessWidget {
               child: TextButton(
                 child: Text('Add Moderator ' + users[uid]),
                 onPressed: () async {
+                  Navigator.pop(context);
                   try {
                     await ChatRoom.instance.addModerator(uid);
                   } catch (e) {
@@ -271,6 +276,7 @@ class RemoveModerator extends StatelessWidget {
               child: TextButton(
                 child: Text('Remove Moderator ' + users[uid]),
                 onPressed: () async {
+                  Navigator.pop(context);
                   try {
                     await ChatRoom.instance.removeModerator(uid);
                   } catch (e) {

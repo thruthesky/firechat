@@ -37,6 +37,11 @@ service cloud.firestore {
           (
           'moderators' in resource.data && request.auth.uid in resource.data.moderators
           )
+          ||
+          (
+          request.auth.uid in resource.data.moderators
+          && onlyUpdating(['title'])
+          )
         )
         &&
         (

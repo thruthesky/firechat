@@ -79,7 +79,7 @@ class ChatRoom extends ChatBase {
   ChatGlobalRoom global;
 
   /// Chat room properties
-  String get id => global?.roomId;
+  String get id => global?.roomId ?? '';
   String get title => global?.title;
   List<String> get users => global?.users;
   List<String> get moderators => global?.moderators;
@@ -635,6 +635,9 @@ class ChatRoom extends ChatBase {
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
 
+    // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
+    unsubscribe();
+
     // A moderator leaves the room?
     if (_globalRoom.moderators.contains(loginUserUid)) {
       // There is no more moderator for the room? but there are more than 2 uesrs?
@@ -648,9 +651,6 @@ class ChatRoom extends ChatBase {
 
     // Update users after removing himself.
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
-
-    // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
-    unsubscribe();
 
     // Delete the room that the user is leaving from. (Not the global room.)
     await myRoom(id).delete();

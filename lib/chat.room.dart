@@ -637,6 +637,7 @@ class ChatRoom extends ChatBase {
 
     // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
     unsubscribe();
+    ChatUserRoomList.instance.unsubscribeUserRoom(_globalRoom);
 
     // A moderator leaves the room?
     if (_globalRoom.moderators.contains(loginUserUid)) {

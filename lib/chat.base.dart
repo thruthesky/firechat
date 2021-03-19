@@ -61,13 +61,28 @@ class ChatBase {
     String text = message.text ?? '';
 
     if (text == ChatProtocol.roomCreated) {
-      text = 'Chat room created. ';
+      text = message.senderDisplayName + ' Chat room created. ';
     }
     if (text == ChatProtocol.add) {
-      text = message.senderDisplayName + ' added user ' + message.newUsers.join(',');
+      text = message.senderDisplayName + ' added ' + message.newUsers.join(',');
     }
+    if (text == ChatProtocol.kickout) {
+      text = message.senderDisplayName + ' kicked ' + message.data['userName'];
+    }
+    if (text == ChatProtocol.block) {
+      text = message.senderDisplayName + ' block  ' + message.data['userName'];
+    }
+
+    if (text == ChatProtocol.addModerator) {
+      text = message.senderDisplayName + ' add moderator ' + message.data['userName'];
+    }
+    if (text == ChatProtocol.removeModerator) {
+      text = message.senderDisplayName + ' remove moderator ' + message.data['userName'];
+    }
+
     if (text == ChatProtocol.titleChanged) {
-      text = message.senderDisplayName + ' change room title ' + message.data['newTitle'];
+      text = message.senderDisplayName + ' change room title ';
+      text += message.data['newTitle'] != null ? 'to ' + message.data['newTitle'] : '';
     }
 
     /// Display `no more messages` only when user scrolled up to see more messages.

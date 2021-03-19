@@ -77,7 +77,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
       ),
       body: ChatMessageListWidget(
-        onImageRenderCompelete: () {},
         onError: (e) => print(e),
       ),
       endDrawer: ChatRoomDrawer(),
@@ -246,7 +245,7 @@ class AddModerator extends StatelessWidget {
                 onPressed: () async {
                   Navigator.pop(context);
                   try {
-                    await ChatRoom.instance.addModerator(uid);
+                    await ChatRoom.instance.addModerator(uid, userName: users[uid]);
                   } catch (e) {
                     print('addModerator::error');
                     print(e);
@@ -278,7 +277,7 @@ class RemoveModerator extends StatelessWidget {
                 onPressed: () async {
                   Navigator.pop(context);
                   try {
-                    await ChatRoom.instance.removeModerator(uid);
+                    await ChatRoom.instance.removeModerator(uid, userName: users[uid]);
                   } catch (e) {
                     print('addModerator::error');
                     print(e);

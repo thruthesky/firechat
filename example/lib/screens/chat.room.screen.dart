@@ -77,10 +77,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
       ),
       body: ChatMessageListWidget(
-<<<<<<< HEAD
-        // onImageRenderCompelete: () {},
-=======
->>>>>>> 560e7d2f66748889f98de60fc057b343f818d62c
         onError: (e) => print(e),
       ),
       endDrawer: ChatRoomDrawer(),

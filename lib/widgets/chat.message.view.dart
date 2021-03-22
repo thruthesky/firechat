@@ -86,7 +86,6 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
               Text(
                 shortDateTime(widget.message.createdAt),
                 style: TextStyle(fontSize: 8),
-                // textAlign: widget.message.isMine ? TextAlign.right : TextAlign.left,
               ),
             ],
           ),

@@ -14,9 +14,7 @@ class ChatRoom extends ChatBase {
     return _instance;
   }
 
-  ChatRoom._internal() {
-    print('=> ChatRoom._internal(). This must be called only once.');
-  }
+  ChatRoom._internal();
 
   int _limit = 30;
 

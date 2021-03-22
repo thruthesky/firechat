@@ -15,7 +15,6 @@ class ChatUserRoomList extends ChatBase {
   }
 
   ChatUserRoomList._internal() {
-    print('=> ChatUserRoomList._internal(). This must be called only once.');
     FirebaseAuth.instance.authStateChanges().listen((User user) {
       if (user == null) {
         _unsubscribe();

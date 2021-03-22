@@ -1,21 +1,21 @@
 import 'dart:async';
 
 import 'package:firechat/firechat.dart';
-import 'package:firechat/widgets/chat.room.view.dart';
+import 'package:firechat/widgets/chat.room.list.item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ChatRoomListWidget extends StatefulWidget {
-  ChatRoomListWidget({
+class ChatRoomList extends StatefulWidget {
+  ChatRoomList({
     @required this.onChatRoomTap,
   });
 
   final Function onChatRoomTap;
   @override
-  _ChatRoomListWidgetState createState() => _ChatRoomListWidgetState();
+  _ChatRoomListState createState() => _ChatRoomListState();
 }
 
-class _ChatRoomListWidgetState extends State<ChatRoomListWidget> {
+class _ChatRoomListState extends State<ChatRoomList> {
   StreamSubscription chatUserRoomListSubscription;
 
   @override
@@ -45,7 +45,7 @@ class _ChatRoomListWidgetState extends State<ChatRoomListWidget> {
             itemCount: rooms.length,
             itemBuilder: (_, i) {
               final ChatUserRoom room = rooms[i];
-              return ChatRoomViewWidget(room, onTap: () {
+              return ChatRoomListItem(room, onTap: () {
                 if (widget.onChatRoomTap != null) widget.onChatRoomTap(room);
               });
             },

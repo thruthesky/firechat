@@ -131,6 +131,7 @@ class ChatRoom extends ChatBase {
       throw EMPTY_ID_AND_USERS;
     }
 
+    // Note that, if `id` is set, `users` is ignored. And if both exists, it throws an error.
     if (_id != null) {
       // Enter existing room
       // If permission-denied error happens here,

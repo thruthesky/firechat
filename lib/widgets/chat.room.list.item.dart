@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ChatRoomViewWidget extends StatefulWidget {
-  ChatRoomViewWidget(
+class ChatRoomListItem extends StatefulWidget {
+  ChatRoomListItem(
     this.room, {
     this.onTap,
   });
@@ -13,10 +13,10 @@ class ChatRoomViewWidget extends StatefulWidget {
   final Function onTap;
 
   @override
-  _ChatRoomViewWidgetState createState() => _ChatRoomViewWidgetState();
+  _ChatRoomListItemState createState() => _ChatRoomListItemState();
 }
 
-class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
+class _ChatRoomListItemState extends State<ChatRoomListItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -24,7 +24,7 @@ class _ChatRoomViewWidgetState extends State<ChatRoomViewWidget> {
       //   widget.room.profilePhotoUrl ?? '',
       // ),
       title: Text(
-        widget.room.global.title ?? widget.room.id,
+        widget.room.global?.title ?? widget.room.id,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(

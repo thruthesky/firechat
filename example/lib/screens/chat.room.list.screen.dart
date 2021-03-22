@@ -24,7 +24,7 @@ class _ChatRoomListScreenState extends State<ChatRoomListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Chat Room List')),
-      body: ChatRoomListWidget(
+      body: ChatRoomList(
         onChatRoomTap: (ChatUserRoom room) {
           Navigator.push(
               context,

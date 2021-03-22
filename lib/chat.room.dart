@@ -9,12 +9,10 @@ class ChatRoom extends ChatBase {
   static ChatRoom _instance;
   static ChatRoom get instance {
     if (_instance == null) {
-      _instance = ChatRoom._internal();
+      _instance ??= ChatRoom();
     }
     return _instance;
   }
-
-  ChatRoom._internal();
 
   int _limit = 30;
 
@@ -24,8 +22,6 @@ class ChatRoom extends ChatBase {
   /// [_throttle] is working together with [_throttling]
   /// 1500ms is recommended.
   int _throttle = 1500;
-
-  /// TODO overwrite this setting by Firestore setting.
   bool _throttling = false;
 
   ///
@@ -461,16 +457,6 @@ class ChatRoom extends ChatBase {
     // print('send messages to: ${messages.length}');
     await Future.wait(messages);
 
-    // TODO: Sending notification should be handled outside of firechat.
-
-    // await __ff.sendNotification(
-    //   '$displayName send you message.',
-    //   text,
-    //   id: id,
-    //   screen: 'chatRoom',
-    //   topic: topic,
-    // );
-
     return message;
   }
 
@@ -519,7 +505,6 @@ class ChatRoom extends ChatBase {
     /// Update last message of room users.
     // print('newUserNames:');
     // print(users.values.toList());
-    // TODO: display name.
     await sendMessage(text: ChatProtocol.add, displayName: loginUserUid, extra: {
       'newUsers': users.values.toList(),
     });

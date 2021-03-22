@@ -15,7 +15,6 @@ This is a complete Firebase chat package that has the following functions;
 - Listening changes of room list and showing new messages.
 - Room password lock
 
-
 # Reference
 
 - Most of the code is coming from [FireFlutter](https://github.com/thruthesky/fireflutter#chat).
@@ -124,13 +123,21 @@ a.firebaseInitialized.listen((ready) { // when firebase initialized,
   FireChatTest().roomCreateTest(); // call test.
 });
 ```
+
 Known Issues
 
 git error
+
 ```error
 fatal: filename in tree entry contains backslash: 'build\ios'
 ```
+
 solution
+
 ```
 git config --global core.protectNTFS false
 ```
+
+# Known Problems
+
+- You may see permission error when user logs out and logs into another accounts. And simply ignore that error.

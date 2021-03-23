@@ -4,17 +4,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessageButtomActions extends StatefulWidget {
-  ChatMessageButtomActions({this.onError});
+  ChatMessageButtomActions({
+    this.onError,
+    this.onPressUploadIcon,
+  });
+
   final Function onError;
+
+  final Function onPressUploadIcon;
 
   @override
   _ChatMessageButtomActionsState createState() => _ChatMessageButtomActionsState();
 }
 
 class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
-  /// upload progress
-  double progress = 0;
-
   /// show loader if sending is true
   bool sending = false;
 
@@ -62,16 +65,22 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (progress > 0)
+        if (ChatRoom.instance.progress > 0)
           LinearProgressIndicator(
-            value: progress,
+            value: ChatRoom.instance.progress,
           ),
         Padding(
           padding: EdgeInsets.all(16),
           child: Row(
             children: [
               /// Upload Icon Button
-              uploadIconButton(),
+              IconButton(
+
+                  /// if progress is not 0, show loader.
+                  icon: Icon(Icons.camera_alt),
+                  onPressed: () {
+                    if (widget.onPressUploadIcon != null) widget.onPressUploadIcon();
+                  }),
               Expanded(
                 child: TextFormField(
                   controller: ChatRoom.instance.textController,

@@ -8,10 +8,12 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 class ChatMessageListWidget extends StatefulWidget {
   ChatMessageListWidget({
     this.onError,
+    this.onPressUploadIcon,
     Key key,
   }) : super(key: key);
 
   final Function onError;
+  final Function onPressUploadIcon;
 
   @override
   _ChatMessageListWidgetState createState() => _ChatMessageListWidgetState();
@@ -41,7 +43,10 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
                   ),
                 ),
               ),
-              ChatMessageButtomActions(onError: widget.onError)
+              ChatMessageButtomActions(
+                onError: widget.onError,
+                onPressUploadIcon: widget.onPressUploadIcon,
+              )
             ],
           );
   }

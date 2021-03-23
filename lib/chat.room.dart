@@ -16,6 +16,9 @@ class ChatRoom extends ChatBase {
 
   int _limit = 30;
 
+  /// upload progress
+  double progress = 0;
+
   /// When user scrolls to top to view previous messages, the app fires the scroll event
   /// too much, so it fetches too many batches(pages) at one time.
   /// [_throttle] reduces the scroll event to relax the fetch racing.

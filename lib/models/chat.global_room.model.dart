@@ -26,6 +26,7 @@ class ChatGlobalRoom extends ChatBase {
     this.moderators,
     this.blockedUsers,
     this.createdAt,
+    this.updatedAt,
   });
 
   /// If room does not exists, return null.
@@ -45,6 +46,7 @@ class ChatGlobalRoom extends ChatBase {
       moderators: List<String>.from(info['moderators'] ?? []),
       blockedUsers: List<String>.from(info['blockedUsers'] ?? []),
       createdAt: info['createdAt'],
+      updatedAt: info['updatedAt'],
     );
   }
 

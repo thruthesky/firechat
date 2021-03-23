@@ -100,7 +100,7 @@ class ChatRoom extends ChatBase {
 
   String _displayName;
 
-  String get _getDisplayName => _displayName ?? loginUserUid;
+  String get displayName => _displayName ?? loginUserUid;
 
   /// Enter chat room
   ///
@@ -270,7 +270,7 @@ class ChatRoom extends ChatBase {
 
     await sendMessage(
       text: ChatProtocol.roomCreated,
-      displayName: _getDisplayName,
+      displayName: displayName,
     );
   }
 
@@ -513,7 +513,7 @@ class ChatRoom extends ChatBase {
     /// Update last message of room users.
     // print('newUserNames:');
     // print(users.values.toList());
-    await sendMessage(text: ChatProtocol.add, displayName: _getDisplayName, extra: {
+    await sendMessage(text: ChatProtocol.add, displayName: displayName, extra: {
       'newUsers': users.values.toList(),
     });
   }
@@ -538,7 +538,7 @@ class ChatRoom extends ChatBase {
 
     /// Inform all users.
     await sendMessage(
-        text: ChatProtocol.block, displayName: _getDisplayName, extra: {'userName': userName});
+        text: ChatProtocol.block, displayName: displayName, extra: {'userName': userName});
   }
 
   /// Add a moderator
@@ -555,7 +555,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(id).update({'moderators': moderators});
     await sendMessage(
         text: ChatProtocol.addModerator,
-        displayName: _getDisplayName,
+        displayName: displayName,
         extra: {'userName': userName ?? uid});
   }
 
@@ -570,7 +570,7 @@ class ChatRoom extends ChatBase {
 
     await sendMessage(
         text: ChatProtocol.removeModerator,
-        displayName: _getDisplayName,
+        displayName: displayName,
         extra: {'userName': userName ?? uid});
   }
 
@@ -604,7 +604,7 @@ class ChatRoom extends ChatBase {
 
     // Update last message of room users that the user is leaving.
     await sendMessage(
-        text: ChatProtocol.leave, displayName: _getDisplayName, extra: {'userName': loginUserUid});
+        text: ChatProtocol.leave, displayName: displayName, extra: {'userName': loginUserUid});
 
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
@@ -647,7 +647,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
     await sendMessage(
-        text: ChatProtocol.kickout, displayName: _getDisplayName, extra: {'userName': userName});
+        text: ChatProtocol.kickout, displayName: displayName, extra: {'userName': userName});
   }
 
   /// Returns a room of a user.
@@ -669,7 +669,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'title': title});
 
     await sendMessage(
-        text: ChatProtocol.titleChanged, displayName: _getDisplayName, extra: {'newTitle': title});
+        text: ChatProtocol.titleChanged, displayName: displayName, extra: {'newTitle': title});
   }
 
   editMessage(ChatMessage message) {

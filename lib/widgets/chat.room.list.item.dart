@@ -39,7 +39,7 @@ class _ChatRoomListItemState extends State<ChatRoomListItem> {
             // style: subtitle1,
           ),
           Spacer(),
-          if (widget.room.newMessages > 0)
+          if (int.parse(widget.room.newMessages) > 0)
             ConstrainedBox(
               constraints: BoxConstraints(maxHeight: 24),
               child: Chip(

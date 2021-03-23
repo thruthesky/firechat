@@ -218,7 +218,7 @@ class ChatRoom extends ChatBase {
       // If the user got a message from a chat room where the user is currently in,
       // then, set `newMessages` to 0.
       final data = ChatUserRoom.fromSnapshot(doc);
-      if (data.newMessages > 0 && data.createdAt != null) {
+      if (int.parse(data.newMessages) > 0 && data.createdAt != null) {
         currentRoom.update({'newMessages': 0});
       }
     });

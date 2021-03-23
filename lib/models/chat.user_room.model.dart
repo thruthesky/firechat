@@ -15,10 +15,10 @@ class ChatUserRoom {
   /// [createAt] is the time that last message was sent by a user.
   /// It will be `FieldValue.serverTimestamp()` when it sends the
   /// message. And it will `Timestamp` when it read the room information.
-  dynamic createdAt;
+  String createdAt;
 
   /// [newMessages] has the number of new messages for that room.
-  int newMessages;
+  String newMessages;
 
   /// [global] is the global room information
   ChatGlobalRoom global;

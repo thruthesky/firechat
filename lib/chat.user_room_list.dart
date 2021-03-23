@@ -106,7 +106,7 @@ class ChatUserRoomList extends ChatBase {
 
       newMessages = 0;
       rooms.forEach((roomInfo) {
-        newMessages += roomInfo.newMessages;
+        newMessages += int.parse(roomInfo.newMessages);
       });
 
       changes.add(null);

@@ -6,7 +6,7 @@ part of '../firechat.dart';
 /// [isImage] returns bool if the message is image or not.
 class ChatMessage {
   String id;
-  String createdAt;
+  Timestamp createdAt;
   List<String> newUsers;
   String senderDisplayName;
   String senderPhotoURL;

@@ -15,7 +15,7 @@ class ChatUserRoom {
   /// [createAt] is the time that last message was sent by a user.
   /// It will be `FieldValue.serverTimestamp()` when it sends the
   /// message. And it will `Timestamp` when it read the room information.
-  String createdAt;
+  Timestamp createdAt;
 
   /// [newMessages] has the number of new messages for that room.
   String newMessages;
@@ -58,7 +58,7 @@ class ChatUserRoom {
       newUsers: List<String>.from(info['newUsers'] ?? []),
       createdAt: info['createdAt'],
       text: _text,
-      newMessages: info['newMessages'],
+      newMessages: "${info['newMessages']}",
     );
   }
 

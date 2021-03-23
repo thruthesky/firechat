@@ -98,6 +98,10 @@ class ChatRoom extends ChatBase {
   // this will use to wait until the image is properly loaded before it scroll to bottom
   String lastImage;
 
+  String _displayName;
+
+  String get _getDisplayName => _displayName ?? loginUserUid;
+
   /// Enter chat room
   ///
   /// If [hatch] is set to true, then it will always create new room even if you are talking to
@@ -108,9 +112,10 @@ class ChatRoom extends ChatBase {
   /// Null or empty string in [users] will be wiped out.
   ///
   /// Whenever global room information changes, it is updated on [global].
-  Future<void> enter({String id, List<String> users, bool hatch = true}) async {
+  Future<void> enter({String id, List<String> users, bool hatch = true, String displayName}) async {
     /// confusing with [this.id], so, it goes as `_id`.
     String _id = id;
+    _displayName = displayName;
 
     if (loginUserUid == null) {
       throw LOGIN_FIRST;
@@ -263,7 +268,10 @@ class ChatRoom extends ChatBase {
 
     global = ChatGlobalRoom.fromSnapshot(await doc.get());
 
-    await sendMessage(text: ChatProtocol.roomCreated, displayName: loginUserUid);
+    await sendMessage(
+      text: ChatProtocol.roomCreated,
+      displayName: _getDisplayName,
+    );
   }
 
   /// Fetch previous messages
@@ -505,7 +513,7 @@ class ChatRoom extends ChatBase {
     /// Update last message of room users.
     // print('newUserNames:');
     // print(users.values.toList());
-    await sendMessage(text: ChatProtocol.add, displayName: loginUserUid, extra: {
+    await sendMessage(text: ChatProtocol.add, displayName: _getDisplayName, extra: {
       'newUsers': users.values.toList(),
     });
   }
@@ -529,7 +537,8 @@ class ChatRoom extends ChatBase {
         .update({'users': _globalRoom.users, 'blockedUsers': _globalRoom.blockedUsers});
 
     /// Inform all users.
-    await sendMessage(text: ChatProtocol.block, displayName: uid, extra: {'userName': userName});
+    await sendMessage(
+        text: ChatProtocol.block, displayName: _getDisplayName, extra: {'userName': userName});
   }
 
   /// Add a moderator
@@ -546,7 +555,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(id).update({'moderators': moderators});
     await sendMessage(
         text: ChatProtocol.addModerator,
-        displayName: loginUserUid,
+        displayName: _getDisplayName,
         extra: {'userName': userName ?? uid});
   }
 
@@ -561,7 +570,7 @@ class ChatRoom extends ChatBase {
 
     await sendMessage(
         text: ChatProtocol.removeModerator,
-        displayName: loginUserUid,
+        displayName: _getDisplayName,
         extra: {'userName': userName ?? uid});
   }
 
@@ -595,7 +604,7 @@ class ChatRoom extends ChatBase {
 
     // Update last message of room users that the user is leaving.
     await sendMessage(
-        text: ChatProtocol.leave, displayName: loginUserUid, extra: {'userName': loginUserUid});
+        text: ChatProtocol.leave, displayName: _getDisplayName, extra: {'userName': loginUserUid});
 
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
@@ -638,7 +647,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'users': _globalRoom.users});
 
     await sendMessage(
-        text: ChatProtocol.kickout, displayName: loginUserUid, extra: {'userName': userName});
+        text: ChatProtocol.kickout, displayName: _getDisplayName, extra: {'userName': userName});
   }
 
   /// Returns a room of a user.
@@ -660,7 +669,7 @@ class ChatRoom extends ChatBase {
     await globalRoomDoc(_globalRoom.roomId).update({'title': title});
 
     await sendMessage(
-        text: ChatProtocol.titleChanged, displayName: loginUserUid, extra: {'newTitle': title});
+        text: ChatProtocol.titleChanged, displayName: _getDisplayName, extra: {'newTitle': title});
   }
 
   editMessage(ChatMessage message) {

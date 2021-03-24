@@ -468,10 +468,10 @@ class ChatRoom extends ChatBase {
       List<Future<void>> messages = [];
 
       /// Just incase there are duplicated UIDs.
-      List<String> newUsers = [...global.users.toSet()];
+      List<String> roomUsers = [...global.users.toSet()];
 
       /// Send a message to all users in the room.
-      for (String uid in newUsers) {
+      for (String uid in roomUsers) {
         // print(chatUserRoomDoc(uid, info['id']).path);
         messages.add(userRoomDoc(uid, global.roomId).set(message, SetOptions(merge: true)));
       }

@@ -23,6 +23,8 @@ class ChatUserRoom {
   /// [global] is the global room information
   ChatGlobalRoom global;
 
+  bool isImage;
+
   ChatUserRoom({
     this.id,
     this.senderUid,
@@ -35,6 +37,7 @@ class ChatUserRoom {
     this.text,
     this.createdAt,
     this.newMessages,
+    this.isImage,
   });
 
   factory ChatUserRoom.fromSnapshot(DocumentSnapshot snapshot) {
@@ -47,6 +50,11 @@ class ChatUserRoom {
     if (info == null) return ChatUserRoom();
 
     String _text = info['text'];
+
+    bool isImage = false;
+    if (_text != null && isImageUrl(_text)) {
+      isImage = true;
+    }
     return ChatUserRoom(
       id: id,
       senderUid: info['senderUid'],
@@ -59,6 +67,7 @@ class ChatUserRoom {
       createdAt: info['createdAt'],
       text: _text,
       newMessages: "${info['newMessages']}",
+      isImage: isImage,
     );
   }
 

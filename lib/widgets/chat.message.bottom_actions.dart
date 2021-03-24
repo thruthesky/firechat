@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firechat/firechat.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +32,7 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
 
     try {
       if (isMessageEdit == null) {
-        await ChatRoom.instance
-            .sendMessage(text: text, displayName: FirebaseAuth.instance.currentUser.uid);
+        await ChatRoom.instance.sendMessage(text: text, displayName: ChatRoom.instance.displayName);
 
         /// Send Push Notification Silently
         // Api.instance.chat.sendChatPushMessage(text).catchError((e) {
@@ -45,8 +43,7 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
         //   }
         // });
       } else {
-        await ChatRoom.instance
-            .sendMessage(text: text, displayName: FirebaseAuth.instance.currentUser.uid);
+        await ChatRoom.instance.sendMessage(text: text, displayName: ChatRoom.instance.displayName);
       }
       sending = false;
     } catch (e) {
@@ -79,6 +76,9 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
                   /// if progress is not 0, show loader.
                   icon: Icon(Icons.camera_alt),
                   onPressed: () {
+                    // emit press instead of callback
+                    ChatRoom.instance.onPressUploadIcon.add(null);
+
                     if (widget.onPressUploadIcon != null) widget.onPressUploadIcon();
                   }),
               Expanded(

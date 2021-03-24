@@ -30,13 +30,8 @@ class ChatMessage {
   });
   factory ChatMessage.fromData(Map<String, dynamic> data) {
     bool isImage = false;
-    if (data['text'] != null) {
-      String t = data['text'];
-      if (t.startsWith('http://') || t.startsWith('https://')) {
-        if (t.endsWith('.jpg') || t.endsWith('.jpeg') || t.endsWith('.gif') || t.endsWith('.png')) {
-          isImage = true;
-        }
-      }
+    if (data['text'] != null && isImageUrl(data['text'])) {
+      isImage = true;
     }
     return ChatMessage(
       id: data['id'] ?? '',

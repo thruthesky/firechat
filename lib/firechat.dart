@@ -14,6 +14,7 @@ import 'package:rxdart/rxdart.dart';
 
 part 'chat.definitions.dart';
 part 'chat.protocol.dart';
+part 'chat.function.dart';
 
 part 'models/chat.global_room.model.dart';
 part 'models/chat.user_room.model.dart';

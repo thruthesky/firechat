@@ -31,6 +31,10 @@ class ChatRoom extends ChatBase {
   // Function _render;
   // Function _globalRoomChange;
 
+  /// when [onPressUploadIcon] icon is press emit.
+  // ignore: close_sinks
+  BehaviorSubject onPressUploadIcon = BehaviorSubject.seeded(null);
+
   /// When the room information changes or there is new message, then [changes] will be posted.
   BehaviorSubject changes = BehaviorSubject.seeded(null);
   // BehaviorSubject<ChatMessage> messages = BehaviorSubject.seeded(null);
@@ -98,7 +102,16 @@ class ChatRoom extends ChatBase {
 
   ChatMessage isMessageEdit;
 
-  // this will use to wait until the image is properly loaded before it scroll to bottom
+  /// [lastImage] can be use to check if the last message is image then
+  /// you can use this to put a delay until it load the image completely.
+  /// Example
+  /// CachedImage(
+  ///   widget.message.text,
+  ///   onLoadComplete: () {
+  ///     if (widget.message.text != ChatRoom.instance.lastImage) return;
+  ///     ChatRoom.instance.imageRenderComplete();
+  ///   },
+  /// )
   String lastImage;
 
   String _displayName;
@@ -348,6 +361,8 @@ class ChatRoom extends ChatBase {
               }
             }
           }
+          // if the message is image then you can call imageRenderComplete when the image load complete
+          if (isImageUrl(message['text'])) lastImage = message['text'];
         } else if (documentChange.type == DocumentChangeType.modified) {
           final int i = messages.indexWhere((r) => r['id'] == message['id']);
           if (i > -1) {
@@ -406,6 +421,7 @@ class ChatRoom extends ChatBase {
   }
 
   resetRoom() {
+    global = null;
     messages = [];
     page = 0;
     noMoreMessage = false;
@@ -435,9 +451,6 @@ class ChatRoom extends ChatBase {
       'senderPhotoURL': photoURL,
       'text': text,
 
-      // Time that this message(or last message) was created.
-      'createdAt': FieldValue.serverTimestamp(),
-
       // Make [newUsers] empty string for re-setting(removing) from previous
       // message.
       'newUsers': [],
@@ -445,28 +458,30 @@ class ChatRoom extends ChatBase {
       if (extra != null) ...extra,
     };
 
-    // message = mergeMap([message, extra]);
+    if (isMessageEdit == null) {
+      // Time that this message(or last message) was created.
+      message['createdAt'] = FieldValue.serverTimestamp();
 
-    // print('my uid: ${f.user.uid}');
-    // print('users: ${this.users}');
-    // print('extra: $extra');
-    // print(message);
-    // print(messagesCol(id).path);
-    await messagesCol(global.roomId).add(message);
-    // print(message);
-    message['newMessages'] = FieldValue.increment(1); // To increase, it must be an udpate.
-    List<Future<void>> messages = [];
+      await messagesCol(global.roomId).add(message);
+      // print(message);
+      message['newMessages'] = FieldValue.increment(1); // To increase, it must be an udpate.
+      List<Future<void>> messages = [];
 
-    /// Just incase there are duplicated UIDs.
-    List<String> newUsers = [...global.users.toSet()];
+      /// Just incase there are duplicated UIDs.
+      List<String> newUsers = [...global.users.toSet()];
 
-    /// Send a message to all users in the room.
-    for (String uid in newUsers) {
-      // print(chatUserRoomDoc(uid, info['id']).path);
-      messages.add(userRoomDoc(uid, global.roomId).set(message, SetOptions(merge: true)));
+      /// Send a message to all users in the room.
+      for (String uid in newUsers) {
+        // print(chatUserRoomDoc(uid, info['id']).path);
+        messages.add(userRoomDoc(uid, global.roomId).set(message, SetOptions(merge: true)));
+      }
+      // print('send messages to: ${messages.length}');
+      await Future.wait(messages);
+    } else {
+      message['updatedAt'] = FieldValue.serverTimestamp();
+      await messagesCol(global.roomId).doc(isMessageEdit.id).update(message);
+      isMessageEdit = null;
     }
-    // print('send messages to: ${messages.length}');
-    await Future.wait(messages);
 
     return message;
   }
@@ -695,7 +710,7 @@ class ChatRoom extends ChatBase {
   }
 
   deleteMessage(ChatMessage message) {
-    print('@todo deleteMessage');
+    messagesCol(id).doc(message.id).delete();
   }
 
   @Deprecated('Use [userRoom]')
@@ -710,9 +725,9 @@ class ChatRoom extends ChatBase {
   Future<ChatUserRoom> get userRoom => getMyRoomInfo(loginUserUid, id);
 
   void imageRenderComplete() {
-    if (ChatRoom.instance.atBottom || ChatRoom.instance.page == 1) {
-      ChatRoom.instance.lastImage = '';
-      ChatRoom.instance.scrollToBottom();
+    if (atBottom || page == 1) {
+      lastImage = '';
+      scrollToBottom();
     }
     _delay.add(null);
   }

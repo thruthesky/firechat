@@ -28,13 +28,13 @@ class ChatMessage {
     this.isImage,
     this.data,
   });
-  factory ChatMessage.fromData(Map<String, dynamic> data) {
+  factory ChatMessage.fromData(Map<String, dynamic> data, {String id}) {
     bool isImage = false;
     if (data['text'] != null && isImageUrl(data['text'])) {
       isImage = true;
     }
     return ChatMessage(
-      id: data['id'] ?? '',
+      id: data['id'] ?? id ?? '',
       createdAt: data['createdAt'],
       newUsers: List<String>.from(data['newUsers'] ?? []),
       senderDisplayName: data['senderDisplayName'] ?? '',

@@ -37,7 +37,7 @@ class _ChatMessageListWidgetState extends State<ChatMessageListWidget> {
                     controller: ChatRoom.instance.scrollController,
                     itemCount: ChatRoom.instance.messages.length,
                     itemBuilder: (_, i) {
-                      final message = ChatMessage.fromData(ChatRoom.instance.messages[i]);
+                      final message = ChatRoom.instance.messages[i];
                       return message.isMine ? myMessage(message) : otherMessage(message);
                     },
                   ),

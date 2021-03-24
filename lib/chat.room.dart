@@ -50,7 +50,7 @@ class ChatRoom extends ChatBase {
   StreamSubscription _delaySubscription;
 
   /// Loaded the chat messages of current chat room.
-  List<Map<String, dynamic>> messages = [];
+  List<ChatMessage> messages = [];
 
   /// [loading] becomes true while the app is fetching more messages.
   /// The app should display loader while it is fetching.
@@ -101,18 +101,7 @@ class ChatRoom extends ChatBase {
   }
 
   ChatMessage isMessageEdit;
-
-  /// [lastImage] can be use to check if the last message is image then
-  /// you can use this to put a delay until it load the image completely.
-  /// Example
-  /// CachedImage(
-  ///   widget.message.text,
-  ///   onLoadComplete: () {
-  ///     if (widget.message.text != ChatRoom.instance.lastImage) return;
-  ///     ChatRoom.instance.imageRenderComplete();
-  ///   },
-  /// )
-  String lastImage;
+  bool get isCreate => isMessageEdit == null;
 
   String _displayName;
 
@@ -200,17 +189,26 @@ class ChatRoom extends ChatBase {
 
     ///
     _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
-      /// Scroll down for new message(s)
-      ///
-      /// For image, it will be scrolled down again(one more time) after image had completely loaded.
       if (messages.isNotEmpty) {
         if (page == 1) {
-          scrollToBottom(ms: 10);
-        } else if (atBottom) {
-          scrollToBottom();
+          /// When the user is on first page,
+          /// Scroll to bottom after 200 ms.
+          Timer(Duration(milliseconds: 200), () {
+            changes.add(null);
+            ChatRoom.instance.scrollToBottom();
+          });
+
+          /// And images might not be rendered by 200ms. So, scroll to bottom again after 500ms.
+          Timer(Duration(milliseconds: 500), () {
+            changes.add(null);
+            ChatRoom.instance.scrollToBottom();
+          });
         }
       }
       changes.add(null);
+      if (ChatRoom.instance.atBottom) {
+        ChatRoom.instance.scrollToBottom();
+      }
     });
 
     // fetch latest messages
@@ -311,7 +309,7 @@ class ChatRoom extends ChatBase {
         .limit(_limit); // 몇 개만 가져온다.
 
     if (messages.isNotEmpty) {
-      q = q.startAfter([messages.first['createdAt']]);
+      q = q.startAfter([messages.first.createdAt]);
     }
 
     // print('myUid: $loginUserUid');
@@ -324,9 +322,9 @@ class ChatRoom extends ChatBase {
       Timer(Duration(milliseconds: _throttle), () => _throttling = false);
 
       snapshot.docChanges.forEach((DocumentChange documentChange) {
-        final message = documentChange.doc.data();
+        final message = ChatMessage.fromData(documentChange.doc.data(), id: documentChange.doc.id);
 
-        message['id'] = documentChange.doc.id;
+        // message.id = documentChange.doc.id;
 
         // print('type: ${documentChange.type}. ${message['text']}');
 
@@ -335,15 +333,15 @@ class ChatRoom extends ChatBase {
           // Two events will be fired on the sender's device.
           // First event has null of FieldValue.serverTimestamp()
           // Only one event will be fired on other user's devices.
-          if (message['createdAt'] == null) {
+          if (message.createdAt == null) {
             messages.add(message);
           }
 
           /// if it's new message, add at bottom.
           else if (messages.length > 0 &&
-              messages[0]['createdAt'] != null &&
-              message['createdAt'].microsecondsSinceEpoch >
-                  messages[0]['createdAt'].microsecondsSinceEpoch) {
+              messages[0].createdAt != null &&
+              message.createdAt.microsecondsSinceEpoch >
+                  messages[0].createdAt.microsecondsSinceEpoch) {
             messages.add(message);
           } else {
             // if it's old message, add on top.
@@ -353,23 +351,21 @@ class ChatRoom extends ChatBase {
           // if it is loading old messages
           // and if it has less messages than the limit
           // check if it is the very first message.
-          if (message['createdAt'] != null) {
+          if (message.createdAt != null) {
             if (snapshot.docs.length < _limit) {
-              if (message['text'] == ChatProtocol.roomCreated) {
+              if (message.text == ChatProtocol.roomCreated) {
                 noMoreMessage = true;
                 // print('-----> noMoreMessage: $noMoreMessage');
               }
             }
           }
-          // if the message is image then you can call imageRenderComplete when the image load complete
-          if (isImageUrl(message['text'])) lastImage = message['text'];
         } else if (documentChange.type == DocumentChangeType.modified) {
-          final int i = messages.indexWhere((r) => r['id'] == message['id']);
+          final int i = messages.indexWhere((r) => r.id == message.id);
           if (i > -1) {
             messages[i] = message;
           }
         } else if (documentChange.type == DocumentChangeType.removed) {
-          final int i = messages.indexWhere((r) => r['id'] == message['id']);
+          final int i = messages.indexWhere((r) => r.id == message.id);
           if (i > -1) {
             messages.removeAt(i);
           }
@@ -458,7 +454,7 @@ class ChatRoom extends ChatBase {
       if (extra != null) ...extra,
     };
 
-    if (isMessageEdit == null) {
+    if (isCreate) {
       // Time that this message(or last message) was created.
       message['createdAt'] = FieldValue.serverTimestamp();
 
@@ -698,7 +694,7 @@ class ChatRoom extends ChatBase {
   }
 
   bool isMessageOnEdit(ChatMessage message) {
-    if (isMessageEdit == null) return false;
+    if (isCreate) return false;
     if (!message.isMine) return false;
     return message.id == isMessageEdit.id;
   }
@@ -723,14 +719,6 @@ class ChatRoom extends ChatBase {
   /// Note that `getMyRoomInfo()` returns `ChatRoomInfo` while `myRoom()`
   /// returns document reference.
   Future<ChatUserRoom> get userRoom => getMyRoomInfo(loginUserUid, id);
-
-  void imageRenderComplete() {
-    if (atBottom || page == 1) {
-      lastImage = '';
-      scrollToBottom();
-    }
-    _delay.add(null);
-  }
 
   bool get atBottom {
     return scrollController.offset > (scrollController.position.maxScrollExtent - 640);

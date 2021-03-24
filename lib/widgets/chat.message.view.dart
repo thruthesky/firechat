@@ -51,9 +51,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
                 ? CachedImage(
                     widget.message.text,
                     onLoadComplete: () {
-                      if (widget.message.text != ChatRoom.instance.lastImage) return;
-                      // print('load compelete for the last image only: ${widget.message.text}');
-                      ChatRoom.instance.imageRenderComplete();
+                      ChatRoom.instance.scrollToBottom();
                     },
                   )
                 : Text(

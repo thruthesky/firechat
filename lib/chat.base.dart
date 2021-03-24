@@ -85,10 +85,7 @@ class ChatBase {
       text += message.data['newTitle'] != null ? 'to ' + message.data['newTitle'] : '';
     }
 
-    /// Display `no more messages` only when user scrolled up to see more messages.
-    else if (page > 1 && noMoreMessage) {
-      text = 'No more messages. ';
-    } else if (text == ChatProtocol.enter) {
+    if (text == ChatProtocol.enter) {
       // print(message);
       text = "${message.senderDisplayName} invited ${message.newUsers}";
     }

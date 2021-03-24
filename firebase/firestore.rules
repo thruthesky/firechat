@@ -54,7 +54,8 @@ service cloud.firestore {
         // Room users can read room messages.
         allow read: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users;
         // Room users can write his own message.
-        allow write: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
+        allow create, update: if request.auth.uid in get(/databases/$(database)/documents/chat/global-rooms/list/$(roomId)).data.users && request.resource.data.senderUid == request.auth.uid;
+        allow delete: if resource.data.senderUid == request.auth.uid;
       }
     }
 

@@ -27,10 +27,6 @@ class ChatRoom extends ChatBase {
   int _throttle = 1500;
   bool _throttling = false;
 
-  /// when [onPressUploadIcon] icon is press emit.
-  // ignore: close_sinks
-  BehaviorSubject onPressUploadIcon = BehaviorSubject.seeded(null);
-
   /// When the room information changes or there is new message, then [changes] will be posted.
   BehaviorSubject changes = BehaviorSubject.seeded(null);
 

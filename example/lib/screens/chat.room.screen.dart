@@ -77,7 +77,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
       ),
       body: ChatMessageListWidget(
-        onError: (e) => print(e),
+        onError: (e) => print('handle on error'),
+        onPressUploadIcon: () => print('handle file upload here'),
       ),
       endDrawer: ChatRoomDrawer(),
     );

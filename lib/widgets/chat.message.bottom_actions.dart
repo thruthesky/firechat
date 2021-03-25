@@ -33,15 +33,6 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
     try {
       if (isMessageEdit == null) {
         await ChatRoom.instance.sendMessage(text: text, displayName: ChatRoom.instance.displayName);
-
-        /// Send Push Notification Silently
-        // Api.instance.chat.sendChatPushMessage(text).catchError((e) {
-        //   if (e == ERROR_EMPTY_TOKENS) {
-        //     // print('No tokens to sends. It is not a critical error');
-        //   } else {
-        //     onError(e);
-        //   }
-        // });
       } else {
         await ChatRoom.instance.sendMessage(text: text, displayName: ChatRoom.instance.displayName);
       }
@@ -77,8 +68,6 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
                   icon: Icon(Icons.camera_alt),
                   onPressed: () {
                     // emit press instead of callback
-                    ChatRoom.instance.onPressUploadIcon.add(null);
-
                     if (widget.onPressUploadIcon != null) widget.onPressUploadIcon();
                   }),
               Expanded(
@@ -116,51 +105,6 @@ class _ChatMessageButtomActionsState extends State<ChatMessageButtomActions> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget uploadIconButton() {
-    return IconButton(
-      /// if progress is not 0, show loader.
-      icon: Icon(Icons.camera_alt),
-      onPressed: () async {
-        print('upload and sending photo');
-        // try {
-        //   /// upload to php backend
-        //   ApiFile file = await imageUpload(
-        //     onProgress: (p) => setState(
-        //       () {
-        //         if (p == 100) {
-        //           Timer(Duration(milliseconds: 400), () {
-        //             progress = 0;
-        //           });
-        //         } else {
-        //           progress = p / 100;
-        //         }
-        //       },
-        //     ),
-        //   );
-
-        //   /// send url to firebase
-        //   await Api.instance.chat.sendMessage(
-        //     text: file.thumbnailUrl,
-        //   );
-
-        //   /// Send Push Notification Silently
-        //   Api.instance.chat
-        //       .sendChatPushMessage('${Api.instance?.chat?.otherUser?.nickname} send you a photo')
-        //       .catchError((e) {
-        //     if (e == ERROR_EMPTY_TOKENS) {
-        //       // print('No tokens to sends. It is not a critical error');
-        //     } else {
-        //       onError(e);
-        //     }
-        //   });
-        // } catch (e) {
-        //   progress = 0;
-        //   onError(e);
-        // }
-      },
     );
   }
 }

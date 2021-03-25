@@ -27,17 +27,16 @@ class ChatRoom extends ChatBase {
   int _throttle = 1500;
   bool _throttling = false;
 
-  ///
-  // Function _render;
-  // Function _globalRoomChange;
-
   /// when [onPressUploadIcon] icon is press emit.
   // ignore: close_sinks
   BehaviorSubject onPressUploadIcon = BehaviorSubject.seeded(null);
 
   /// When the room information changes or there is new message, then [changes] will be posted.
   BehaviorSubject changes = BehaviorSubject.seeded(null);
-  // BehaviorSubject<ChatMessage> messages = BehaviorSubject.seeded(null);
+
+  /// When user scrolls, this event is posted.
+  /// If it is scroll up, true will be passed over the parameter.s
+  PublishSubject<bool> scrollChanges = PublishSubject();
 
   /// Whenever global room information chagnes, [globalRoomChanges] will be posted.
   BehaviorSubject<ChatGlobalRoom> globalRoomChanges = BehaviorSubject.seeded(null);
@@ -46,21 +45,12 @@ class ChatRoom extends ChatBase {
   StreamSubscription _currentRoomSubscription;
   StreamSubscription _globalRoomSubscription;
 
-  PublishSubject _delay = PublishSubject();
-  StreamSubscription _delaySubscription;
-
   /// Loaded the chat messages of current chat room.
   List<ChatMessage> messages = [];
 
   /// [loading] becomes true while the app is fetching more messages.
   /// The app should display loader while it is fetching.
   bool loading = false;
-
-  /// Deprecated: since this produces flashing by rendering again.
-  /// Most of the time, fetching finishes to quickly and users won't see the loader.
-  /// This prevents loading disappearing too quickly.
-  /// 500ms is recommended.
-  // int _loadingTimeout = 500;
 
   /// Current room's global room document.
   ///
@@ -187,30 +177,6 @@ class ChatRoom extends ChatBase {
       }
     }
 
-    ///
-    _delaySubscription = _delay.debounceTime(Duration(milliseconds: 50)).listen((x) {
-      if (messages.isNotEmpty) {
-        if (page == 1) {
-          /// When the user is on first page,
-          /// Scroll to bottom after 200 ms.
-          Timer(Duration(milliseconds: 200), () {
-            changes.add(null);
-            ChatRoom.instance.scrollToBottom();
-          });
-
-          /// And images might not be rendered by 200ms. So, scroll to bottom again after 500ms.
-          Timer(Duration(milliseconds: 500), () {
-            changes.add(null);
-            ChatRoom.instance.scrollToBottom();
-          });
-        }
-      }
-      changes.add(null);
-      if (ChatRoom.instance.atBottom) {
-        ChatRoom.instance.scrollToBottom();
-      }
-    });
-
     // fetch latest messages
     fetchMessages();
 
@@ -244,12 +210,20 @@ class ChatRoom extends ChatBase {
 
     // fetch previous chat when user scrolls up
     scrollController.addListener(() {
+      // mark if scrolled up
+      if (scrollUp) {
+        scrolledUp = true;
+      }
+      // fetch previous messages
       if (scrollUp && atTop) {
         fetchMessages();
       }
+      scrollChanges.add(scrollUp);
     });
 
-    // scroll to bottom only if needed when user open/hide keyboard.
+    // Listen to keyboard
+    //
+    // When keyboard opens, scroll to bottom only if needed when user open/hide keyboard.
     keyboardSubscription = keyboardVisibilityController.onChange.listen((bool visible) {
       if (visible && atBottom) {
         scrollToBottom(ms: 10);
@@ -312,8 +286,12 @@ class ChatRoom extends ChatBase {
       q = q.startAfter([messages.first.createdAt]);
     }
 
-    // print('myUid: $loginUserUid');
-    // print('q.path: ${messagesCol(global.roomId).path}');
+    // Listens all the message for update/delete.
+    //
+    // Note that, when a user chats, [changes] event will be posted twice. one for
+    // create(for offline support), the other for modified(real data from firestore).
+    // And this may cause the app to render twice and scroll to bottom twice. You may
+    // do `debounce` to fix this one.
     _chatRoomSubscription = q.snapshots().listen((snapshot) {
       // print('fetchMessage() -> done: _page: $_page');
       // Block loading previous messages for some time.
@@ -374,7 +352,7 @@ class ChatRoom extends ChatBase {
         }
       });
 
-      _delay.add(null);
+      changes.add(null);
     });
   }
 
@@ -405,10 +383,6 @@ class ChatRoom extends ChatBase {
       _globalRoomSubscription = null;
     }
 
-    if (_delaySubscription != null) {
-      _delaySubscription.cancel();
-      _delaySubscription = null;
-    }
     if (keyboardSubscription != null) {
       keyboardSubscription.cancel();
       keyboardSubscription = null;
@@ -515,18 +489,10 @@ class ChatRoom extends ChatBase {
     /// In this way, newly entered/added user(s) will have the room in the my-room-list
 
     /// Update users array with added user.
-    // print('users:');
-    // print(newUsers);
     final doc = globalRoomDoc(_globalRoom.roomId);
-    // print(doc.path);
-    // print('my uid: ${f.user.uid}');
-    // print(newUsers);
-    // print((await doc.get()).data());
     await doc.update({'users': newUsers});
 
     /// Update last message of room users.
-    // print('newUserNames:');
-    // print(users.values.toList());
     await sendMessage(text: ChatProtocol.add, displayName: displayName, extra: {
       'newUsers': users.values.toList(),
     });
@@ -690,7 +656,7 @@ class ChatRoom extends ChatBase {
     print('editMessage');
     textController.text = message.text;
     isMessageEdit = message;
-    _delay.add(message);
+    changes.add(message);
   }
 
   bool isMessageOnEdit(ChatMessage message) {
@@ -702,7 +668,7 @@ class ChatRoom extends ChatBase {
   cancelEdit() {
     textController.text = '';
     isMessageEdit = null;
-    _delay.add(null);
+    changes.add(null);
   }
 
   deleteMessage(ChatMessage message) {
@@ -728,11 +694,32 @@ class ChatRoom extends ChatBase {
     return scrollController.position.pixels < 200;
   }
 
+  /// The [scrolledUp] becomes true once the user scrolls up the chat room screen.
+  /// Use this to determine if the user has scrolled up the screen.
+  /// This may be used to control the screen to move downward to bottom when there are images on the messages.
+  bool scrolledUp = false;
   bool get scrollUp {
     return scrollController.position.userScrollDirection == ScrollDirection.forward;
   }
 
   bool get scrollDown {
     return scrollController.position.userScrollDirection == ScrollDirection.reverse;
+  }
+
+  onImageLoadComplete(ChatMessage message) {
+    // If the user didn't scroll up the screen (which means, it is really very first time entering the chat room),
+    // then scroll to the bottom on every image load of the message(images).
+    if (scrolledUp == false) {
+      scrollToBottom();
+    }
+
+    // If the last message is image and it is shown to screen for the first time (which means, new image has uploaded/come),
+    // then scroll to the bottom.
+    // Since the image has rendered once it has screen down, when user scrolls up, it will not interrupt the scroll.
+    bool lastMessage = message.id == messages.last.id;
+    if (lastMessage && message.rendered == false) {
+      message.rendered = true;
+      ChatRoom.instance.scrollToBottom();
+    }
   }
 }

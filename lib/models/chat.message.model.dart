@@ -15,6 +15,7 @@ class ChatMessage {
   bool isMine;
   bool isImage;
   Map<String, dynamic> data;
+  bool rendered = false;
 
   ChatMessage({
     this.id,

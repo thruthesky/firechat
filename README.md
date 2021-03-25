@@ -22,8 +22,7 @@ This is a complete Firebase chat package that has the following functions;
 
 # TODOs
 
-- Make chat room and chat list singleton.
-- Use rxdart to notify all the event. No more render!
+- Hide keypad automatically when user scroll the keypad only if the keypad is empty.
 
 # Overview
 
@@ -141,3 +140,5 @@ git config --global core.protectNTFS false
 # Known Problems
 
 - You may see permission error when user logs out and logs into another accounts. And simply ignore that error.
+
+- When user scrolls up the chat room screen, the app will fetch next(previous) bunch of messages and it leads a sundden insertion of messages into chat room message list. And that causes the scroll position change a bit. And we accept it as a normal action.

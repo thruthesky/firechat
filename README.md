@@ -142,3 +142,52 @@ git config --global core.protectNTFS false
 - You may see permission error when user logs out and logs into another accounts. And simply ignore that error.
 
 - When user scrolls up the chat room screen, the app will fetch next(previous) bunch of messages and it leads a sundden insertion of messages into chat room message list. And that causes the scroll position change a bit. And we accept it as a normal action.
+
+# Push notification
+
+- The code below opens the chat room.
+  - When the app is terminated, and there is a chat message arrived as a push notification. And when user tap on it, the app will boot and wait for the user login to firebase and opens the chat room.
+
+```dart
+  /// This will be invoked when the app is opened from terminated state.
+  ///
+  /// Test on both Android device, Emulator, and iOS device. Simulator is not working.
+  onMessageOpenedFromTermiated(RemoteMessage message) {
+    // If it the message has data, then do some exttra work based on the data.
+    onMessageOpenedShowMessage(message);
+  }
+
+  /// This will be invoked when the app is opened from backgroun state.
+  ///
+  /// Test on both Android device, Emulator, and iOS device. Simulator is not working.
+  onMessageOpenedFromBackground(RemoteMessage message) {
+    onMessageOpenedShowMessage(message);
+  }
+
+  onMessageOpenedShowMessage(RemoteMessage message) {
+    /**
+     * return if the the sender is also the current loggedIn user.
+     */
+    if (api.loggedIn && message?.data['senderIdx'] == "${api.user.idx}") return;
+
+    /**
+     * If the type is post then move it to a specific post.
+     */
+    if (message?.data['type'] == 'post') {
+      open(
+        RouteNames.forumList,
+        arguments: {'postIdx': int.parse("${message.data['idx']}")},
+        preventDuplicates: false,
+      );
+    }
+
+    /**
+     * If the type is chat then move it to chat room.
+     */
+    if (message?.data['type'] == 'chat') {
+      api.firebaseAuth.authStateChanges().where((user) => user != null).take(1).listen((user) {
+        openChatRoom(roomId: message.data['roomId']);
+      });
+    }
+  }
+```

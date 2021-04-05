@@ -57,6 +57,10 @@ class ChatRoom extends ChatBase {
   /// Chat room properties
   String get id => global?.roomId ?? '';
   String get title => global?.title;
+
+  /// The [users] holds the firebase uid(s) of the global.users which will be loaded
+  /// when user enters chat room and the global room information has fetched.
+  /// The [users] will be available immediately after chat room entering.
   List<String> get users => global?.users;
   List<String> get moderators => global?.moderators;
   List<String> get blockedUsers => global?.blockedUsers;

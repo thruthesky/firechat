@@ -193,3 +193,60 @@ git config --global core.protectNTFS false
     }
   }
 ```
+
+# Saving last message
+
+- This is how to save the last message.
+
+```dart
+/// Room list chanegs event happens when any of the user room changes.
+roomListChanges.listen((room) {
+  if (room?.text != null) {
+    if (room.senderUid != api.firebaseAuth.currentUser?.uid) { // if it's not my message.(not sent by me.)
+      int seconds = room?.createdAt?.seconds;
+      int lastMessageSeconds = GetStorage().read('lastMessageSeconds');
+      if (lastMessageSeconds == null || seconds > lastMessageSeconds) { // if no message written before or it's newer(last) message.
+        print('Going to save last message');
+        GetStorage().write('lastMessageSeconds', seconds);
+        GetStorage().write('lastMessage', room?.text);
+      }
+    } else {
+      print('This is my chat. do not save');
+    }
+  }
+});
+```
+
+- Below is to display.
+
+```dart
+
+class _ChatLastMessage extends State<ChatLastMessage> {
+  String lastMessage = GetStorage().read('lastMessage');
+  @override
+  void initState() {
+    super.initState();
+    GetStorage().listenKey('lastMessage', (val) {
+      if (mounted) setState(() => lastMessage = val);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(Ionicons.ios_chatbubbles, color: white),
+        spaceXs,
+        Expanded(
+          child: Text(
+            lastMessage ?? '...',
+            style: tsWhite,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+```

@@ -33,6 +33,9 @@ class ChatUserRoomList extends ChatBase {
   /// - When global room information changes. it will pass the user room of the global room.
   BehaviorSubject<ChatUserRoom> changes = BehaviorSubject.seeded(null);
 
+  /// The [message] event will be posted only when there is a new chat message.
+  PublishSubject<ChatUserRoom> message = PublishSubject();
+
   StreamSubscription _myRoomListSubscription;
   Map<String, StreamSubscription> _roomSubscriptions = {};
 
@@ -81,6 +84,7 @@ class ChatUserRoomList extends ChatBase {
             },
           );
         } else if (documentChange.type == DocumentChangeType.modified) {
+          message.add(roomInfo);
           int found = rooms.indexWhere((r) => r.id == roomInfo.id);
           // If global room information exists, copy it to updated object to
           // maintain global room information.

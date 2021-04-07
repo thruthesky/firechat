@@ -27,7 +27,11 @@ class ChatUserRoomList extends ChatBase {
 
   // Function __render;
 
-  BehaviorSubject changes = BehaviorSubject.seeded(null);
+  /// This event is posted when
+  /// - gets all the room list of user when it first run. The last room will be passed over.
+  /// - and when there is new chat, user room will be modified, so, this event will be passed over again with the room that has chagned.
+  /// - When global room information changes. it will pass the user room of the global room.
+  BehaviorSubject<ChatUserRoom> changes = BehaviorSubject.seeded(null);
 
   StreamSubscription _myRoomListSubscription;
   Map<String, StreamSubscription> _roomSubscriptions = {};
@@ -62,7 +66,7 @@ class ChatUserRoomList extends ChatBase {
       snapshot.docChanges.forEach((DocumentChange documentChange) {
         final roomInfo = ChatUserRoom.fromSnapshot(documentChange.doc);
 
-        print(roomInfo.newMessages);
+        // print(roomInfo.newMessages);
         if (documentChange.type == DocumentChangeType.added) {
           rooms.add(roomInfo);
 
@@ -72,8 +76,8 @@ class ChatUserRoomList extends ChatBase {
             (DocumentSnapshot snapshot) {
               int found = rooms.indexWhere((r) => r.id == roomInfo.id);
               rooms[found].global = ChatGlobalRoom.fromSnapshot(snapshot);
-              // snapshot.data();
-              changes.add(null);
+              // print('global room has changed. ${rooms[found]}');
+              changes.add(rooms[found]);
             },
           );
         } else if (documentChange.type == DocumentChangeType.modified) {
@@ -93,23 +97,13 @@ class ChatUserRoomList extends ChatBase {
         }
       });
 
-      // // get total newMessages and can be use to display like badge.
-      // myRoomListCol.where('newMessages', isGreaterThan: 0).get().then((snapshot) {
-      //   print("myRoomListCol.where('newMessages', isGreaterThan: 0)");
-      //   newMessages = 0;
-      //   snapshot.docs.forEach((documentSnapshot) {
-      //     final roomInfo = ChatUserRoom.fromSnapshot(documentSnapshot);
-      //     newMessages += roomInfo.newMessages;
-      //   });
-      //   changes.add(null);
-      // });
-
       newMessages = 0;
       rooms.forEach((roomInfo) {
         newMessages += int.parse(roomInfo.newMessages);
       });
 
-      changes.add(null);
+      /// post event with last room
+      changes.add(ChatUserRoom.fromSnapshot(snapshot.docChanges.last.doc));
     });
   }
 
@@ -120,9 +114,6 @@ class ChatUserRoomList extends ChatBase {
         _roomSubscriptions[key].cancel();
       }
       _roomSubscriptions = {};
-      // _roomSubscriptions.foreach((element) {
-      //    _roomSubscriptions[k].cancel();
-      // });
     }
     newMessages = 0;
   }

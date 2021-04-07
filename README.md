@@ -99,6 +99,8 @@ firebase emulators:start --only firestore   ; run firebase emulator
 
 ## Global varaibles
 
+- You may declare short helper tools like below.
+
 ```dart
 room() {
   return ChatRoom.instance;

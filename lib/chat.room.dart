@@ -28,7 +28,14 @@ class ChatRoom extends ChatBase {
   bool _throttling = false;
 
   /// When the room information changes or there is new message, then [changes] will be posted.
-  BehaviorSubject changes = BehaviorSubject.seeded(null);
+  ///
+  /// This event will be posted when
+  /// - init with `null`
+  /// - fetching messages(created, modified, updated), with the last chat message.
+  ///   When there are messages from Firestore, there might be many message in one fetch, that's why it returns only last message.
+  /// - sending a message, with the chat message to be sent.
+  /// - cancelling for sending a message. `null` will be passed.
+  BehaviorSubject<ChatMessage> changes = BehaviorSubject.seeded(null);
 
   /// When user scrolls, this event is posted.
   /// If it is scroll up, true will be passed over the parameter.s
@@ -352,7 +359,7 @@ class ChatRoom extends ChatBase {
         }
       });
 
-      changes.add(null);
+      changes.add(messages.last);
     });
   }
 

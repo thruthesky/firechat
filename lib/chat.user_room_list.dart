@@ -103,7 +103,8 @@ class ChatUserRoomList extends ChatBase {
       });
 
       /// post event with last room
-      changes.add(snapshot.docChanges?.length > 0
+
+      changes.add(snapshot.docChanges.length > 0
           ? ChatUserRoom.fromSnapshot(snapshot.docChanges.last.doc)
           : null);
     });

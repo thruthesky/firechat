@@ -41,7 +41,9 @@ class ChatRoom extends ChatBase {
   /// If it is scroll up, true will be passed over the parameter.s
   PublishSubject<bool> scrollChanges = PublishSubject();
 
-  /// Whenever global room information chagnes, [globalRoomChanges] will be posted.
+  /// Whenever global room information chagnes, [globalRoomChanges] will be posted with
+  /// the global room document
+  ///
   BehaviorSubject<ChatGlobalRoom> globalRoomChanges = BehaviorSubject.seeded(null);
 
   StreamSubscription _chatRoomSubscription;

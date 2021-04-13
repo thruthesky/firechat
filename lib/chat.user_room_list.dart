@@ -27,16 +27,18 @@ class ChatUserRoomList extends ChatBase {
 
   // Function __render;
 
-  /// This event is posted when
+  /// This event is posted with a room info when
   /// - gets all the room list of user when it first run. The last room will be passed over.
   /// - and when there is new chat, user room will be modified, so, this event will be passed over again with the room that has chagned.
   /// - When global room information changes. it will pass the user room of the global room.
+  ///
+  /// To get the whole list of room info, use [rooms].
   BehaviorSubject<ChatUserRoom> changes = BehaviorSubject.seeded(null);
 
   StreamSubscription _myRoomListSubscription;
   Map<String, StreamSubscription> _roomSubscriptions = {};
 
-  /// My room list including room id.
+  /// Login user's whole room list including room id.
   List<ChatUserRoom> rooms = [];
   String _order = "createdAt";
 

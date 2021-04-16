@@ -61,7 +61,7 @@ class ChatBase {
     String text = message.text ?? '';
 
     if (text == ChatProtocol.roomCreated) {
-      text = message.senderDisplayName + ' Chat room created. ';
+      text = message.senderDisplayName + '님이 채팅방을 개설했습니다.';
     }
     if (text == ChatProtocol.add) {
       text = message.senderDisplayName + ' added ' + message.newUsers.join(',');

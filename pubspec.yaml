@@ -11,15 +11,21 @@ dependencies:
   flutter:
     sdk: flutter
 
-  intl: ^0.16.0
-  firebase_core: "0.7.0"
-  firebase_auth: "^0.20.1"
-  cloud_firestore: "^0.16.0+1"
+  # intl: ^0.16.0
+  intl: ^0.17.0
+  # firebase_core: "0.7.0"
+  # firebase_auth: "^0.20.1"
+  # cloud_firestore: "^0.16.0+1"
+  firebase_core: ^1.0.3
+  firebase_auth: ^1.1.0
+  cloud_firestore: ^1.0.5
 
   crypto: "^2.1.5"
+  # crypto: ^3.0.1
 
   # Chat room. Scroll adjustment when keypad is open.
-  flutter_keyboard_visibility: ^4.0.6
+  # flutter_keyboard_visibility: ^4.0.6
+  flutter_keyboard_visibility: ^5.0.1
 
   flutter_chat_bubble: ^1.0.2
 

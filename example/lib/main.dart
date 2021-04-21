@@ -107,19 +107,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   subscribeChat() {
     globalRoomSubscription = ChatRoom.instance.globalRoomChanges.listen((rooms) {
-      print('global rooms;');
-      print(rooms);
+      // print('global rooms;');
+      // print(rooms);
     });
 
     chatRoomSubscription = ChatRoom.instance.changes.listen((value) {
-      print('room changes;');
-      print(value);
+      // print('room changes;');
+      // print(value);
     });
 
     /// When any of the login user's rooms changes, it will be handled here.
     chatRoomListSubscription = ChatUserRoomList.instance.changes.listen((rooms) {
-      print('room list change;');
-      print(rooms);
+      // print('room list change;');
+      // print(rooms);
     });
   }
 

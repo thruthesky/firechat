@@ -581,7 +581,6 @@ class ChatRoom extends ChatBase {
   ///
   /// then move the room information from /chat/info/room-list to /chat/info/deleted-room-list.
   Future<void> leave() async {
-    //
     ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
 
     // If there is only one user left (which is himself), then he can leave without setting other user to admin.
@@ -597,10 +596,6 @@ class ChatRoom extends ChatBase {
 
     /// remove the login user from [_globalRoom.users] users array.
     _globalRoom.users.remove(loginUserUid);
-
-    // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
-    unsubscribe();
-    ChatUserRoomList.instance.unsubscribeUserRoom(_globalRoom);
 
     // A moderator leaves the room?
     if (_globalRoom.moderators.contains(loginUserUid)) {
@@ -618,6 +613,10 @@ class ChatRoom extends ChatBase {
 
     // Delete the room that the user is leaving from. (Not the global room.)
     await myRoom(id).delete();
+
+    // This will cause `null` for room existence check on currentRoom.snapshot().listener(...);
+    unsubscribe();
+    ChatUserRoomList.instance.unsubscribeUserRoom(_globalRoom);
   }
 
   /// Kicks a user out of the room.

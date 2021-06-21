@@ -2,7 +2,7 @@ part of './firechat.dart';
 
 String otherUserUid(List<String> users) {
   if (users == null) return '';
-  return users.firstWhere((uid) => uid != ChatRoom.instance.loginUserUid);
+  return users.firstWhere((uid) => uid != ChatRoom.instance.loginUserUid, orElse: () => '');
 }
 
 List<String> otherUsersUid(List<String> users) {

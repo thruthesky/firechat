@@ -14,6 +14,7 @@ class ChatMessage {
   String text;
   bool isMine;
   bool isImage;
+  bool isVideo;
   Map<String, dynamic> data;
   bool rendered = false;
 
@@ -27,10 +28,15 @@ class ChatMessage {
     this.text,
     this.isMine,
     this.isImage,
+    this.isVideo,
     this.data,
   });
   factory ChatMessage.fromData(Map<String, dynamic> data, {String id}) {
     bool isImage = false;
+    bool isVideo = false;
+
+    // print('ChatMessage data: $data');
+
     if (data['text'] != null && isImageUrl(data['text'])) {
       isImage = true;
     }
@@ -44,6 +50,7 @@ class ChatMessage {
       text: data['text'] ?? '',
       isMine: data['senderUid'] == ChatRoom.instance.loginUserUid,
       isImage: isImage,
+      isVideo: isVideo,
       data: data,
     );
   }

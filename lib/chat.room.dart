@@ -313,7 +313,7 @@ class ChatRoom extends ChatBase {
 
         // message.id = documentChange.doc.id;
 
-        // print('type: ${documentChange.type}. ${message['text']}');
+        print('type: ${documentChange.type}. ${message.text}');
 
         /// 새로 채팅을 하거나, 이전 글을 가져 올 때, 새 채팅(생성)뿐만 아니라, 이전 채팅 글을 가져올 때에도 added 이벤트 발생.
         if (documentChange.type == DocumentChangeType.added) {

@@ -31,6 +31,12 @@ class ChatMessage {
     this.isVideo,
     this.data,
   });
+  bool get isMovie {
+    final String t = text.toLowerCase();
+    if (t.startsWith('http') && (t.endsWith('.mov') || t.endsWith('.mp4'))) return true;
+    return false;
+  }
+
   factory ChatMessage.fromData(Map<String, dynamic> data, {String id}) {
     bool isImage = false;
     bool isVideo = false;

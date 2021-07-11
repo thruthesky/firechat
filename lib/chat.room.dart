@@ -619,6 +619,12 @@ class ChatRoom extends ChatBase {
     ChatUserRoomList.instance.unsubscribeUserRoom(_globalRoom);
   }
 
+  Future<void> exit() async {
+    ChatGlobalRoom _globalRoom = await getGlobalRoom(id);
+    _globalRoom.users.remove(loginUserUid);
+    await myRoom(id).delete();
+  }
+
   /// Kicks a user out of the room.
   ///
   /// The user who was kicked can enter room again by himself. Somebody must add

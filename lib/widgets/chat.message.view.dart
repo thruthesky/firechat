@@ -103,7 +103,7 @@ class _ChatMessageViewWidgetState extends State<ChatMessageViewWidget> {
     if (time.year == today.year && time.month == today.month && time.day == today.day) {
       return DateFormat.jm().format(time);
     }
-    return DateFormat('dd/MM/yy').format(time);
+    return DateFormat('yy년 MM월 dd일').format(time);
   }
 }
 
